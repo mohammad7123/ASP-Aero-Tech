@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: inquiries
     description: Website inquiry submissions
+  - name: admin
+    description: Protected content management operations
 paths:
   /healthz:
     get:
@@ -47,6 +49,257 @@ paths:
                 $ref: "#/components/schemas/Inquiry"
         "400":
           description: Invalid inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/session:
+    get:
+      operationId: getAdminSession
+      tags: [admin]
+      summary: Get the current admin session
+      responses:
+        "200":
+          description: Current session state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+  /admin/setup:
+    post:
+      operationId: setupAdmin
+      tags: [admin]
+      summary: Create the first administrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminSetupInput"
+      responses:
+        "201":
+          description: Administrator created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthResponse"
+        "400":
+          description: Invalid administrator details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: An administrator already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Sign in to the admin panel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Signed in administrator
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthResponse"
+        "400":
+          description: Invalid credentials format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Sign out of the admin panel
+      responses:
+        "204":
+          description: Signed out
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get admin dashboard metrics
+      responses:
+        "200":
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/resources/{resource}:
+    get:
+      operationId: listAdminResource
+      tags: [admin]
+      summary: List records for an admin resource
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Resource records and field metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminResourceList"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAdminResource
+      tags: [admin]
+      summary: Create a record in an admin resource
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminResourceInput"
+      responses:
+        "201":
+          description: Created resource record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminResourceMutationResponse"
+        "400":
+          description: Invalid resource data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/resources/{resource}/{id}:
+    patch:
+      operationId: updateAdminResource
+      tags: [admin]
+      summary: Update a record in an admin resource
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminResourceInput"
+      responses:
+        "200":
+          description: Updated resource record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminResourceMutationResponse"
+        "400":
+          description: Invalid resource data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown resource or record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAdminResource
+      tags: [admin]
+      summary: Delete a record from an admin resource
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Record deleted
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown resource or record
           content:
             application/json:
               schema:
@@ -115,4 +368,133 @@ components:
           type: string
       required:
         - error
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: number
+        username:
+          type: string
+        email:
+          type: ["string", "null"]
+        role:
+          type: string
+      required: [id, username, email, role]
+    AdminSession:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        admin:
+          type: ["object", "null"]
+          $ref: "#/components/schemas/AdminUser"
+      required: [authenticated, admin]
+    AdminSetupInput:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+        email:
+          type: ["string", "null"]
+      required: [username, password]
+    AdminLoginInput:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 1
+      required: [username, password]
+    AdminAuthResponse:
+      type: object
+      properties:
+        admin:
+          $ref: "#/components/schemas/AdminUser"
+      required: [admin]
+    AdminOverview:
+      type: object
+      properties:
+        inquiriesTotal:
+          type: number
+        unreadInquiries:
+          type: number
+        publishedPages:
+          type: number
+        activeServices:
+          type: number
+        activeProducts:
+          type: number
+        openJobs:
+          type: number
+        publishedPosts:
+          type: number
+        recentInquiries:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminResourceRow"
+      required:
+        - inquiriesTotal
+        - unreadInquiries
+        - publishedPages
+        - activeServices
+        - activeProducts
+        - openJobs
+        - publishedPosts
+        - recentInquiries
+    AdminResourceField:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+        required:
+          type: boolean
+        editable:
+          type: boolean
+      required: [name, label, type, required, editable]
+    AdminResourceRow:
+      type: object
+      additionalProperties: true
+    AdminResourceList:
+      type: object
+      properties:
+        resource:
+          type: string
+        label:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminResourceField"
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminResourceRow"
+        total:
+          type: number
+      required: [resource, label, fields, rows, total]
+    AdminResourceInput:
+      type: object
+      properties:
+        values:
+          type: object
+          additionalProperties: true
+      required: [values]
+    AdminResourceMutationResponse:
+      type: object
+      properties:
+        resource:
+          type: string
+        row:
+          $ref: "#/components/schemas/AdminResourceRow"
+      required: [resource, row]
 

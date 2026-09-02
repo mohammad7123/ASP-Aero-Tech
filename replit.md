@@ -1,6 +1,6 @@
-# [Project name]
+# APS Aero Tech
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Public aerospace website and protected content-management console for ASP Aertech Private Limited.
 
 ## Run & Operate
 
@@ -22,15 +22,21 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/aps-aero-tech` — public website and `/admin` console
+- `artifacts/api-server/src/routes/admin.ts` — protected admin API and resource allowlist
+- `lib/api-spec/openapi.yaml` — source of truth for API contracts
+- `attached_assets/0_schema_1788377382482.sql` — uploaded PostgreSQL schema dump used for the full development migration
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Admin sessions are signed, HTTP-only cookies backed by `SESSION_SECRET`; no session tokens are exposed to browser JavaScript.
+- The first administrator is created through a one-time setup flow only while `admin_users` is empty.
+- Admin resource SQL is generated exclusively from a server-side allowlist; user values are always parameterized and secret settings are not exposed.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Cinematic aerospace landing page with a database-backed inquiry form.
+- Protected admin dashboard with metrics, inquiry handling, search, and CRUD management for website content, jobs, campaigns, media metadata, and safe site settings.
 
 ## User preferences
 
@@ -38,7 +44,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Orval currently emits a duplicate `ListAdminResourceParams` type/value re-export. After API codegen, remove the generated-types wildcard export from `lib/api-zod/src/index.ts`, then run `pnpm run typecheck:libs`.
 
 ## Pointers
 

@@ -1,0 +1,1 @@
+- [API codegen re-export collision](api-codegen-reexport.md) — Orval duplicates a path-parameter export; keep the runtime Zod barrel free of generated type wildcard exports.

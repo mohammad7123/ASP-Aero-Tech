@@ -36,3 +36,81 @@ export interface ErrorResponse {
   error: string;
 }
 
+export interface AdminUser {
+  id: number;
+  username: string;
+  /** @nullable */
+  email: string | null;
+  role: string;
+}
+
+export interface AdminSession {
+  authenticated: boolean;
+  /** @nullable */
+  admin: AdminUser | null;
+}
+
+export interface AdminSetupInput {
+  /** @minLength 3 */
+  username: string;
+  /** @minLength 8 */
+  password: string;
+  /** @nullable */
+  email?: string | null;
+}
+
+export interface AdminLoginInput {
+  /** @minLength 3 */
+  username: string;
+  /** @minLength 1 */
+  password: string;
+}
+
+export interface AdminAuthResponse {
+  admin: AdminUser;
+}
+
+export interface AdminResourceRow { [key: string]: unknown }
+
+export interface AdminOverview {
+  inquiriesTotal: number;
+  unreadInquiries: number;
+  publishedPages: number;
+  activeServices: number;
+  activeProducts: number;
+  openJobs: number;
+  publishedPosts: number;
+  recentInquiries: AdminResourceRow[];
+}
+
+export interface AdminResourceField {
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
+  editable: boolean;
+}
+
+export interface AdminResourceList {
+  resource: string;
+  label: string;
+  fields: AdminResourceField[];
+  rows: AdminResourceRow[];
+  total: number;
+}
+
+export type AdminResourceInputValues = { [key: string]: unknown };
+
+export interface AdminResourceInput {
+  values: AdminResourceInputValues;
+}
+
+export interface AdminResourceMutationResponse {
+  resource: string;
+  row: AdminResourceRow;
+}
+
+export type ListAdminResourceParams = {
+search?: string;
+};
+

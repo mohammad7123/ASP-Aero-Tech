@@ -17,9 +17,12 @@ export function Footer() {
         </div>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} ASP Aertech Private Limited. All Rights Reserved.</p>
-          <p className="flex items-center gap-2 font-mono">
-            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" /> 
-            DATA LINK ACTIVE
+          <p className="flex items-center gap-4 font-mono">
+            <a href="/admin" className="hover:text-primary transition-colors uppercase tracking-wider font-bold">Admin</a>
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" /> 
+              DATA LINK ACTIVE
+            </span>
           </p>
         </div>
       </div>

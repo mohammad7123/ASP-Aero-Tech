@@ -50,3 +50,158 @@ export const CreateInquiryResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the current admin session
+ */
+export const GetAdminSessionResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+}).nullable()
+})
+
+
+/**
+ * @summary Create the first administrator
+ */
+export const setupAdminBodyUsernameMin = 3;
+
+export const setupAdminBodyPasswordMin = 8;
+
+
+
+export const SetupAdminBody = zod.object({
+  "username": zod.string().min(setupAdminBodyUsernameMin),
+  "password": zod.string().min(setupAdminBodyPasswordMin),
+  "email": zod.string().nullish()
+})
+
+export const SetupAdminResponse = zod.object({
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+})
+})
+
+
+/**
+ * @summary Sign in to the admin panel
+ */
+export const adminLoginBodyUsernameMin = 3;
+
+
+
+
+export const AdminLoginBody = zod.object({
+  "username": zod.string().min(adminLoginBodyUsernameMin),
+  "password": zod.string().min(1)
+})
+
+export const AdminLoginResponse = zod.object({
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+})
+})
+
+
+/**
+ * @summary Sign out of the admin panel
+ */
+export const AdminLogoutResponse = zod.void()
+
+
+/**
+ * @summary Get admin dashboard metrics
+ */
+export const GetAdminOverviewResponse = zod.object({
+  "inquiriesTotal": zod.number(),
+  "unreadInquiries": zod.number(),
+  "publishedPages": zod.number(),
+  "activeServices": zod.number(),
+  "activeProducts": zod.number(),
+  "openJobs": zod.number(),
+  "publishedPosts": zod.number(),
+  "recentInquiries": zod.array(zod.record(zod.string(), zod.unknown()))
+})
+
+
+/**
+ * @summary List records for an admin resource
+ */
+export const ListAdminResourceParams = zod.object({
+  "resource": zod.coerce.string()
+})
+
+export const ListAdminResourceQueryParams = zod.object({
+  "search": zod.coerce.string().optional()
+})
+
+export const ListAdminResourceResponse = zod.object({
+  "resource": zod.string(),
+  "label": zod.string(),
+  "fields": zod.array(zod.object({
+  "name": zod.string(),
+  "label": zod.string(),
+  "type": zod.string(),
+  "required": zod.boolean(),
+  "editable": zod.boolean()
+})),
+  "rows": zod.array(zod.record(zod.string(), zod.unknown())),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Create a record in an admin resource
+ */
+export const CreateAdminResourceParams = zod.object({
+  "resource": zod.coerce.string()
+})
+
+export const CreateAdminResourceBody = zod.object({
+  "values": zod.record(zod.string(), zod.unknown())
+})
+
+export const CreateAdminResourceResponse = zod.object({
+  "resource": zod.string(),
+  "row": zod.record(zod.string(), zod.unknown())
+})
+
+
+/**
+ * @summary Update a record in an admin resource
+ */
+export const UpdateAdminResourceParams = zod.object({
+  "resource": zod.coerce.string(),
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminResourceBody = zod.object({
+  "values": zod.record(zod.string(), zod.unknown())
+})
+
+export const UpdateAdminResourceResponse = zod.object({
+  "resource": zod.string(),
+  "row": zod.record(zod.string(), zod.unknown())
+})
+
+
+/**
+ * @summary Delete a record from an admin resource
+ */
+export const DeleteAdminResourceParams = zod.object({
+  "resource": zod.coerce.string(),
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminResourceResponse = zod.void()
+
+

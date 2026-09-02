@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import Home from '@/pages/Home';
+import AdminPage from '@/pages/admin/AdminPage';
 import {
   Route,
   Switch,
@@ -12,13 +13,22 @@ import {
   Router as WouterRouter,
 } from 'wouter';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/admin" component={AdminPage} />
+        <Route path="/admin/:rest*" component={AdminPage} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
