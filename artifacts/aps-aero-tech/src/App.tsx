@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
-import Home from '@/pages/Home';
+import { ImportedSite } from '@/pages/ImportedSite';
 import AdminPage from '@/pages/admin/AdminPage';
 import {
   Route,
@@ -26,7 +26,12 @@ function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/about" component={ImportedSite} />
+        <Route path="/services" component={ImportedSite} />
+        <Route path="/products" component={ImportedSite} />
+        <Route path="/industries" component={ImportedSite} />
+        <Route path="/contact" component={ImportedSite} />
+        <Route path="/" component={ImportedSite} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/admin/:rest*" component={AdminPage} />
         <Route component={NotFound} />
