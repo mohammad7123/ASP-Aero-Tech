@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "APS Aero Tech"
+description = "A bold corporate website for ASP Aertech Private Limited, a drone manufacturing company focused on defence, industrial, and intelligent aerial systems."
+version = "1.0.0"
+id = "artifacts/aps-aero-tech"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19716
+
+[services.development]
+run = "pnpm --filter @workspace/aps-aero-tech run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aps-aero-tech", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/aps-aero-tech/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19716"
+BASE_PATH = "/"
