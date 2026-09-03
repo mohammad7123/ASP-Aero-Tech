@@ -1,7 +1,7 @@
 import { Route, Switch, useLocation } from "wouter"
 import { AdminOverview } from "./AdminOverview"
 import { AdminResourceView } from "./AdminResourceView"
-import { Sidebar } from "./Sidebar"
+import { ADMIN_RESOURCES, Sidebar } from "./Sidebar"
 import { Shield, LogOut } from "lucide-react"
 import { useAdminLogout, getGetAdminSessionQueryKey } from "@workspace/api-client-react"
 import { useQueryClient } from "@tanstack/react-query"
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 export function AdminWorkspace() {
   const queryClient = useQueryClient()
   const logout = useAdminLogout()
-  const [, setLocation] = useLocation()
+  const [location, setLocation] = useLocation()
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -30,7 +30,7 @@ export function AdminWorkspace() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         
         {/* Top Navbar */}
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 shrink-0 z-10 relative">
+        <header className="min-h-16 border-b border-border bg-card flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 shrink-0 z-10 relative">
           <div className="absolute inset-0 pointer-events-none opacity-10"
             style={{ backgroundImage: 'linear-gradient(90deg, var(--primary) 1px, transparent 1px)', backgroundSize: '100px 100%' }}
           />
@@ -48,10 +48,27 @@ export function AdminWorkspace() {
               TERMINATE
             </Button>
           </div>
+
+          <label className="z-10 order-3 w-full md:hidden">
+            <span className="sr-only">Admin section</span>
+            <select
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              className="h-10 w-full border border-border bg-background px-3 font-mono text-xs uppercase text-foreground"
+              data-testid="select-admin-mobile-navigation"
+            >
+              <option value="/admin">Overview</option>
+              {ADMIN_RESOURCES.map((resource) => (
+                <option key={resource.id} value={`/admin/resources/${resource.id}`}>
+                  {resource.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-auto p-6 md:p-8 bg-background relative">
+        <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8 bg-background relative">
           <div className="max-w-7xl mx-auto w-full">
             <Switch>
               <Route path="/admin" component={AdminOverview} />

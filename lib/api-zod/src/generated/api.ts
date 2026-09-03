@@ -51,6 +51,78 @@ export const CreateInquiryResponse = zod.object({
 
 
 /**
+ * @summary List active homepage hero slides
+ */
+export const ListHeroSlidesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "subtitle": zod.string().nullable(),
+  "imageUrl": zod.string(),
+  "eyebrow": zod.string().nullable(),
+  "badge": zod.string().nullable(),
+  "ctaText": zod.string().nullable(),
+  "ctaUrl": zod.string().nullable(),
+  "stat1": zod.string().nullable(),
+  "stat2": zod.string().nullable(),
+  "stat3": zod.string().nullable()
+})
+export const ListHeroSlidesResponse = zod.array(ListHeroSlidesResponseItem)
+
+
+/**
+ * @summary List active career opportunities
+ */
+export const ListOpenJobsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "department": zod.string(),
+  "location": zod.string(),
+  "type": zod.string(),
+  "description": zod.string(),
+  "requirements": zod.string(),
+  "salaryRange": zod.string().nullable()
+})
+export const ListOpenJobsResponse = zod.array(ListOpenJobsResponseItem)
+
+
+/**
+ * @summary List published blog posts
+ */
+export const ListPublishedBlogPostsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "featuredImage": zod.string().nullable(),
+  "category": zod.string().nullable(),
+  "publishedAt": zod.coerce.date().nullable()
+})
+export const ListPublishedBlogPostsResponse = zod.array(ListPublishedBlogPostsResponseItem)
+
+
+/**
+ * @summary Get a published blog post by slug
+ */
+export const GetPublishedBlogPostParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetPublishedBlogPostResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "featuredImage": zod.string().nullable(),
+  "category": zod.string().nullable(),
+  "publishedAt": zod.coerce.date().nullable()
+}).and(zod.object({
+  "content": zod.string(),
+  "metaTitle": zod.string().nullable(),
+  "metaDescription": zod.string().nullable()
+}))
+
+
+/**
  * @summary Get the current admin session
  */
 export const GetAdminSessionResponse = zod.object({

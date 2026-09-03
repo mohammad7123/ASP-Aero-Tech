@@ -26,15 +26,18 @@ function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
+        <Route path="/admin/resources/:resource" component={AdminPage} />
+        <Route path="/admin" component={AdminPage} />
         <Route path="/about" component={ImportedSite} />
         <Route path="/services" component={ImportedSite} />
         <Route path="/products" component={ImportedSite} />
         <Route path="/products/:slug" component={ImportedSite} />
         <Route path="/industries" component={ImportedSite} />
+        <Route path="/careers" component={ImportedSite} />
+        <Route path="/blog" component={ImportedSite} />
+        <Route path="/blog/:slug" component={ImportedSite} />
         <Route path="/contact" component={ImportedSite} />
         <Route path="/" component={ImportedSite} />
-        <Route path="/admin" component={AdminPage} />
-        <Route path="/admin/:rest*" component={AdminPage} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>

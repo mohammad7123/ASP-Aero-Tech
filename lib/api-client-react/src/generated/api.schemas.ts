@@ -32,6 +32,62 @@ export interface InquiryInput {
   message: string;
 }
 
+export interface HeroSlide {
+  id: number;
+  title: string;
+  /** @nullable */
+  subtitle: string | null;
+  imageUrl: string;
+  /** @nullable */
+  eyebrow: string | null;
+  /** @nullable */
+  badge: string | null;
+  /** @nullable */
+  ctaText: string | null;
+  /** @nullable */
+  ctaUrl: string | null;
+  /** @nullable */
+  stat1: string | null;
+  /** @nullable */
+  stat2: string | null;
+  /** @nullable */
+  stat3: string | null;
+}
+
+export interface Job {
+  id: number;
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  description: string;
+  requirements: string;
+  /** @nullable */
+  salaryRange: string | null;
+}
+
+export interface BlogPostSummary {
+  id: number;
+  title: string;
+  slug: string;
+  /** @nullable */
+  excerpt: string | null;
+  /** @nullable */
+  featuredImage: string | null;
+  /** @nullable */
+  category: string | null;
+  /** @nullable */
+  publishedAt: string | null;
+}
+
+export type BlogPost = BlogPostSummary & ({
+  content: string;
+  /** @nullable */
+  metaTitle: string | null;
+  /** @nullable */
+  metaDescription: string | null;
+});
+
 export interface ErrorResponse {
   error: string;
 }

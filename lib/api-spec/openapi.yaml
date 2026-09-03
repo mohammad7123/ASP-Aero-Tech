@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: inquiries
     description: Website inquiry submissions
+  - name: content
+    description: Public website content managed through the admin panel
   - name: admin
     description: Protected content management operations
 paths:
@@ -49,6 +51,72 @@ paths:
                 $ref: "#/components/schemas/Inquiry"
         "400":
           description: Invalid inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /content/hero-slides:
+    get:
+      operationId: listHeroSlides
+      tags: [content]
+      summary: List active homepage hero slides
+      responses:
+        "200":
+          description: Active hero slides in display order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeroSlide"
+  /content/jobs:
+    get:
+      operationId: listOpenJobs
+      tags: [content]
+      summary: List active career opportunities
+      responses:
+        "200":
+          description: Active jobs in display order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+  /content/blog-posts:
+    get:
+      operationId: listPublishedBlogPosts
+      tags: [content]
+      summary: List published blog posts
+      responses:
+        "200":
+          description: Published blog posts ordered newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlogPostSummary"
+  /content/blog-posts/{slug}:
+    get:
+      operationId: getPublishedBlogPost
+      tags: [content]
+      summary: Get a published blog post by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Published blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+        "404":
+          description: Blog post not found
           content:
             application/json:
               schema:
@@ -361,6 +429,83 @@ components:
         - email
         - interest
         - message
+    HeroSlide:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        subtitle:
+          type: ["string", "null"]
+        imageUrl:
+          type: string
+        eyebrow:
+          type: ["string", "null"]
+        badge:
+          type: ["string", "null"]
+        ctaText:
+          type: ["string", "null"]
+        ctaUrl:
+          type: ["string", "null"]
+        stat1:
+          type: ["string", "null"]
+        stat2:
+          type: ["string", "null"]
+        stat3:
+          type: ["string", "null"]
+      required: [id, title, subtitle, imageUrl, eyebrow, badge, ctaText, ctaUrl, stat1, stat2, stat3]
+    Job:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: string
+        salaryRange:
+          type: ["string", "null"]
+      required: [id, title, department, location, type, description, requirements, salaryRange]
+    BlogPostSummary:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: ["string", "null"]
+        featuredImage:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+      required: [id, title, slug, excerpt, featuredImage, category, publishedAt]
+    BlogPost:
+      allOf:
+        - $ref: "#/components/schemas/BlogPostSummary"
+        - type: object
+          properties:
+            content:
+              type: string
+            metaTitle:
+              type: ["string", "null"]
+            metaDescription:
+              type: ["string", "null"]
+          required: [content, metaTitle, metaDescription]
     ErrorResponse:
       type: object
       properties:

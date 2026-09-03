@@ -28,10 +28,14 @@ import type {
   AdminResourceMutationResponse,
   AdminSession,
   AdminSetupInput,
+  BlogPost,
+  BlogPostSummary,
   ErrorResponse,
   HealthStatus,
+  HeroSlide,
   Inquiry,
   InquiryInput,
+  Job,
   ListAdminResourceParams
 } from './api.schemas';
 
@@ -211,6 +215,314 @@ export const useCreateInquiry = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getCreateInquiryMutationOptions(options));
     }
+
+export const getListHeroSlidesUrl = () => {
+
+
+
+
+  return `/api/content/hero-slides`
+}
+
+/**
+ * @summary List active homepage hero slides
+ */
+export const listHeroSlides = async ( options?: Parameters<typeof customFetch>[1]): Promise<HeroSlide[]> => {
+
+  return customFetch<HeroSlide[]>(getListHeroSlidesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListHeroSlidesQueryKey = () => {
+    return [
+    `/api/content/hero-slides`
+    ] as const;
+    }
+
+
+export const getListHeroSlidesQueryOptions = <TData = Awaited<ReturnType<typeof listHeroSlides>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHeroSlides>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHeroSlidesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHeroSlides>>> = ({ signal }) => listHeroSlides({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHeroSlides>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListHeroSlidesQueryResult = NonNullable<Awaited<ReturnType<typeof listHeroSlides>>>
+export type ListHeroSlidesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List active homepage hero slides
+ */
+
+export function useListHeroSlides<TData = Awaited<ReturnType<typeof listHeroSlides>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listHeroSlides>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListHeroSlidesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListOpenJobsUrl = () => {
+
+
+
+
+  return `/api/content/jobs`
+}
+
+/**
+ * @summary List active career opportunities
+ */
+export const listOpenJobs = async ( options?: Parameters<typeof customFetch>[1]): Promise<Job[]> => {
+
+  return customFetch<Job[]>(getListOpenJobsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListOpenJobsQueryKey = () => {
+    return [
+    `/api/content/jobs`
+    ] as const;
+    }
+
+
+export const getListOpenJobsQueryOptions = <TData = Awaited<ReturnType<typeof listOpenJobs>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOpenJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListOpenJobsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOpenJobs>>> = ({ signal }) => listOpenJobs({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listOpenJobs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListOpenJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listOpenJobs>>>
+export type ListOpenJobsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List active career opportunities
+ */
+
+export function useListOpenJobs<TData = Awaited<ReturnType<typeof listOpenJobs>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOpenJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListOpenJobsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListPublishedBlogPostsUrl = () => {
+
+
+
+
+  return `/api/content/blog-posts`
+}
+
+/**
+ * @summary List published blog posts
+ */
+export const listPublishedBlogPosts = async ( options?: Parameters<typeof customFetch>[1]): Promise<BlogPostSummary[]> => {
+
+  return customFetch<BlogPostSummary[]>(getListPublishedBlogPostsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublishedBlogPostsQueryKey = () => {
+    return [
+    `/api/content/blog-posts`
+    ] as const;
+    }
+
+
+export const getListPublishedBlogPostsQueryOptions = <TData = Awaited<ReturnType<typeof listPublishedBlogPosts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublishedBlogPosts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublishedBlogPostsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublishedBlogPosts>>> = ({ signal }) => listPublishedBlogPosts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublishedBlogPosts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublishedBlogPostsQueryResult = NonNullable<Awaited<ReturnType<typeof listPublishedBlogPosts>>>
+export type ListPublishedBlogPostsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List published blog posts
+ */
+
+export function useListPublishedBlogPosts<TData = Awaited<ReturnType<typeof listPublishedBlogPosts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublishedBlogPosts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublishedBlogPostsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublishedBlogPostUrl = (slug: string,) => {
+
+
+
+
+  return `/api/content/blog-posts/${slug}`
+}
+
+/**
+ * @summary Get a published blog post by slug
+ */
+export const getPublishedBlogPost = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<BlogPost> => {
+
+  return customFetch<BlogPost>(getGetPublishedBlogPostUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublishedBlogPostQueryKey = (slug: string,) => {
+    return [
+    `/api/content/blog-posts/${slug}`
+    ] as const;
+    }
+
+
+export const getGetPublishedBlogPostQueryOptions = <TData = Awaited<ReturnType<typeof getPublishedBlogPost>>, TError = ErrorType<ErrorResponse>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedBlogPost>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublishedBlogPostQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublishedBlogPost>>> = ({ signal }) => getPublishedBlogPost(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublishedBlogPost>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublishedBlogPostQueryResult = NonNullable<Awaited<ReturnType<typeof getPublishedBlogPost>>>
+export type GetPublishedBlogPostQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a published blog post by slug
+ */
+
+export function useGetPublishedBlogPost<TData = Awaited<ReturnType<typeof getPublishedBlogPost>>, TError = ErrorType<ErrorResponse>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublishedBlogPost>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublishedBlogPostQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetAdminSessionUrl = () => {
 

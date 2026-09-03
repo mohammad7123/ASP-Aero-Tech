@@ -115,7 +115,7 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
           <h1 className="text-3xl font-display font-bold uppercase tracking-widest text-foreground">{data.label}</h1>
           <p className="text-muted-foreground font-mono text-xs uppercase tracking-wider">{data.total} RECORDS DETECTED</p>
         </div>
-        <div className="flex items-center gap-4 w-full sm:w-auto">
+        <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
@@ -125,7 +125,7 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button onClick={handleOpenCreate} className="h-10">
+          <Button onClick={handleOpenCreate} className="h-10 w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             NEW RECORD
           </Button>
@@ -208,7 +208,7 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
                         <option value="false">FALSE</option>
                         <option value="true">TRUE</option>
                       </select>
-                    ) : f.type === 'text' ? (
+                    ) : f.type === 'textarea' || f.type === 'json' ? (
                       <textarea
                         className="flex min-h-[120px] w-full rounded-sm border border-input bg-background/50 px-3 py-2 text-sm shadow-sm font-mono"
                         value={formData[f.name] || ''}
@@ -217,9 +217,9 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
                       />
                     ) : (
                       <Input
-                        type={f.type === 'number' ? 'number' : 'text'}
-                        value={formData[f.name] || ''}
-                        onChange={(e) => setFormData({...formData, [f.name]: f.type === 'number' ? Number(e.target.value) : e.target.value})}
+                        type={f.type === 'number' ? 'number' : f.type === 'date' ? 'datetime-local' : f.type === 'url' ? 'url' : 'text'}
+                        value={formData[f.name] ?? ''}
+                        onChange={(e) => setFormData({...formData, [f.name]: f.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value})}
                         required={f.required}
                       />
                     )}

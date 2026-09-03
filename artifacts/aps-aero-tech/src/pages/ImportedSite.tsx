@@ -1,6 +1,8 @@
 import { FormEvent, ReactNode, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { ProductsPage, ProductDetailPage } from "./Catalog";
+import { BlogDetailPage, BlogPage, CareersPage } from "./PublicContent";
+import { DynamicHero } from "@/components/DynamicHero";
 import {
   ArrowRight,
   Award,
@@ -49,6 +51,12 @@ const navItems = [
   { label: "Services", href: "/services" },
   { label: "Products", href: "/products" },
   { label: "Industries", href: "/industries" },
+];
+
+const moreNavItems = [
+  { label: "Insights", href: "/blog" },
+  { label: "Careers", href: "/careers" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const serviceItems = [
@@ -117,9 +125,9 @@ function LegacyLayout({ children }: { children: ReactNode }) {
                 More <ChevronDown size={14} />
               </button>
               <div className="invisible absolute right-0 top-[62px] w-52 translate-y-2 rounded-xl border border-gray-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                {["/products", "/contact"].map((href) => (
-                  <Link key={href} href={href} className="block rounded-lg px-3 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-[#D4920C]">
-                    {href.slice(1).replace("-", " ").replace(/^\w/, (c) => c.toUpperCase())}
+                {moreNavItems.map((item) => (
+                  <Link key={item.href} href={item.href} className="block rounded-lg px-3 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-[#D4920C]">
+                    {item.label}
                   </Link>
                 ))}
               </div>
@@ -136,6 +144,11 @@ function LegacyLayout({ children }: { children: ReactNode }) {
         {open && (
           <nav className="border-t border-gray-100 bg-white px-5 py-3 lg:hidden">
             {navItems.map((item) => (
+              <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`block border-b border-gray-100 py-3 text-sm font-semibold ${location === item.href ? "text-[#D4920C]" : "text-gray-600"}`}>
+                {item.label}
+              </Link>
+            ))}
+            {moreNavItems.slice(0, 2).map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`block border-b border-gray-100 py-3 text-sm font-semibold ${location === item.href ? "text-[#D4920C]" : "text-gray-600"}`}>
                 {item.label}
               </Link>
@@ -209,22 +222,7 @@ function SectionHeading({ eyebrow, title, text, light = false }: { eyebrow: stri
 function HomePage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-[#1A1F36]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_40%,rgba(212,146,12,.26),transparent_30%),linear-gradient(115deg,#1A1F36_0%,#252C51_65%,#3D4FA0_100%)]" />
-        <div className="relative mx-auto grid max-w-[1440px] items-center gap-12 px-5 py-16 sm:px-8 md:py-24 lg:grid-cols-[1.02fr_.98fr] lg:py-28">
-          <div>
-            <span className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em]" style={{ color: primary }}><span className="h-0.5 w-8" style={{ backgroundColor: primary }} /> Indigenous unmanned aerial systems</span>
-            <h1 className="max-w-3xl text-5xl font-black leading-[.98] tracking-tight text-white sm:text-6xl lg:text-[76px]">Built to fly. <span style={{ color: primary }}>Engineered</span> for the mission.</h1>
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">ASP Aero Tech designs and manufactures mission-configurable drones for intelligence, surveillance, inspection, mapping, emergency response, and autonomous operations.</p>
-            <div className="mt-8 flex flex-wrap gap-3"><Link href="/contact" className="inline-flex items-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5" style={{ backgroundColor: orange }}>Request a briefing <ArrowRight size={16} /></Link><Link href="/products" className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10">Explore platforms <ChevronRight size={16} /></Link></div>
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-bold uppercase tracking-wider text-white/50"><span className="flex items-center gap-2"><Check size={14} style={{ color: primary }} /> Designed &amp; manufactured in India</span><span className="flex items-center gap-2"><Check size={14} style={{ color: primary }} /> Mission-configurable architecture</span></div>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-3 rounded-[28px] border border-white/10" />
-            <div className="relative overflow-hidden rounded-2xl bg-white/10 shadow-2xl"><img src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1200&q=85" alt="Unmanned aerial vehicle in flight" className="h-[360px] w-full object-cover opacity-85 sm:h-[440px]" /><div className="absolute inset-0 bg-gradient-to-t from-[#1A1F36] via-transparent to-transparent" /><div className="absolute bottom-0 left-0 p-6"><div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/65"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Mission ready</div><p className="max-w-xs text-lg font-bold text-white">Airframe, payload, autonomy, and support from one engineering team.</p></div></div>
-          </div>
-        </div>
-      </section>
+      <DynamicHero />
 
       <section className="border-b border-gray-100 bg-white py-12"><div className="mx-auto grid max-w-[1440px] gap-8 px-5 sm:px-8 md:grid-cols-3"><div className="flex gap-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-50" style={{ color: orange }}><Target size={22} /></div><div><h3 className="font-bold text-[#1A1F36]">Mission configured</h3><p className="mt-1 text-sm leading-relaxed text-gray-500">Aircraft and payloads tailored to operational objectives.</p></div></div><div className="flex gap-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50" style={{ color: blue }}><ShieldCheck size={22} /></div><div><h3 className="font-bold text-[#1A1F36]">Validated in flight</h3><p className="mt-1 text-sm leading-relaxed text-gray-500">Structured testing for safety, endurance, control, and reliability.</p></div></div><div className="flex gap-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50" style={{ color: primary }}><Zap size={22} /></div><div><h3 className="font-bold text-[#1A1F36]">Ready to deploy</h3><p className="mt-1 text-sm leading-relaxed text-gray-500">Training, support, spares, and lifecycle planning included.</p></div></div></div></section>
 
@@ -289,6 +287,9 @@ export function ImportedSite() {
   else if (location === "/products") page = <ProductsPage />;
   else if (location.startsWith("/products/") && params.slug) page = <ProductDetailPage slug={params.slug} />;
   else if (location === "/industries") page = <IndustriesPage />;
+  else if (location === "/careers") page = <CareersPage />;
+  else if (location === "/blog") page = <BlogPage />;
+  else if (location.startsWith("/blog/") && params.slug) page = <BlogDetailPage slug={params.slug} />;
   else if (location === "/contact") page = <ContactPage />;
   return <LegacyLayout>{page}</LegacyLayout>;
 }

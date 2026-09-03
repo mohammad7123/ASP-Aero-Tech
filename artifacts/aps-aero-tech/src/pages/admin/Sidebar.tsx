@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter"
 import { LayoutDashboard, Users, MessageSquare, Briefcase, FileText, Image, Settings, Layers, Box, Factory, Mail, Menu, Newspaper, Target } from "lucide-react"
 import { cn } from "@/components/ui/button"
 
-const RESOURCES = [
+export const ADMIN_RESOURCES = [
   { id: "inquiries", label: "Inquiries", icon: Mail },
   { id: "hero-slides", label: "Hero Slides", icon: Image },
   { id: "services", label: "Services", icon: Briefcase },
@@ -59,7 +59,7 @@ export function Sidebar() {
             Data Modules
           </div>
           <div className="space-y-1">
-            {RESOURCES.map(res => {
+            {ADMIN_RESOURCES.map(res => {
               const isActive = location === `/admin/resources/${res.id}`
               const Icon = res.icon
               return (
