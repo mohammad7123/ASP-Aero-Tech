@@ -19,6 +19,7 @@ import {
   UpdateAdminResourceParams,
   UpdateAdminResourceResponse,
 } from "@workspace/api-zod";
+import { ObjectStorageService } from "../lib/objectStorage";
 
 type FieldType = "text" | "textarea" | "url" | "number" | "boolean" | "date" | "json";
 type Field = { name: string; label: string; type: FieldType; required?: boolean; editable?: boolean };
@@ -63,6 +64,7 @@ const resources: Record<string, Resource> = {
 };
 
 const router: IRouter = Router();
+const objectStorage = new ObjectStorageService();
 const cookieName = "asp_admin_session";
 const secret = () => {
   if (!process.env.SESSION_SECRET) throw new Error("SESSION_SECRET is required");
@@ -132,6 +134,26 @@ const parseValues = (r: Resource, input: Record<string, unknown>, create: boolea
     values.category = String(categories[0]);
   }
   return values;
+};
+const cleanupUnreferencedProductImage = async (req: Request, imagePath: unknown) => {
+  if (typeof imagePath !== "string" || !imagePath.trim()) return;
+
+  try {
+    const normalizedPath = objectStorage.normalizeObjectEntityPath(imagePath);
+    if (!normalizedPath.startsWith("/objects/")) return;
+
+    const references = await pool.query<{ image_url: string | null }>(
+      "SELECT image_url FROM product_items WHERE image_url IS NOT NULL",
+    );
+    const stillReferenced = references.rows.some(
+      (row) => typeof row.image_url === "string" && objectStorage.normalizeObjectEntityPath(row.image_url) === normalizedPath,
+    );
+    if (stillReferenced) return;
+
+    await objectStorage.deleteObjectEntity(normalizedPath);
+  } catch (error) {
+    req.log.error({ err: error, objectPath: imagePath }, "Failed to clean up unreferenced product image");
+  }
 };
 
 router.get("/admin/session", async (req, res): Promise<void> => {
@@ -215,8 +237,14 @@ router.patch("/admin/resources/:resource/:id", async (req, res): Promise<void> =
     const values = parseValues(resource, body.data.values, false);
     const entries = Object.entries(values);
     if (!entries.length) { res.status(400).json({ error: "No editable values supplied" }); return; }
+    const previousImagePath = resource.table === "product_items" && Object.prototype.hasOwnProperty.call(values, "image_url")
+      ? (await pool.query<{ image_url: string | null }>("SELECT image_url FROM product_items WHERE id=$1", [params.data.id])).rows[0]?.image_url
+      : null;
     const result = await pool.query(`UPDATE "${resource.table}" SET ${entries.map(([n], i) => `"${n}"=$${i + 1}`).join(",")}${resource.fields.some((x) => x.name === "updated_at") ? ", updated_at=now()" : ""} WHERE id=$${entries.length + 1} RETURNING ${selected(resource)}`, [...entries.map(([, v]) => v), params.data.id]);
     if (!result.rows[0]) { res.status(404).json({ error: "Record not found" }); return; }
+    if (resource.table === "product_items" && previousImagePath && previousImagePath !== values.image_url) {
+      await cleanupUnreferencedProductImage(req, previousImagePath);
+    }
     res.json(UpdateAdminResourceResponse.parse({ resource: params.data.resource, row: result.rows[0] }));
   } catch (error) { res.status(400).json({ error: error instanceof Error ? error.message : "Invalid resource data" }); }
 });
@@ -227,8 +255,12 @@ router.delete("/admin/resources/:resource/:id", async (req, res): Promise<void> 
   const resource = resources[params.data.resource];
   if (!resource) { res.status(404).json({ error: "Unknown resource" }); return; }
   if (resource.canDelete === false) { res.status(400).json({ error: "This resource cannot be deleted" }); return; }
-  const result = await pool.query(`DELETE FROM "${resource.table}" WHERE id=$1 RETURNING id`, [params.data.id]);
+  const returning = resource.table === "product_items" ? "id, image_url" : "id";
+  const result = await pool.query(`DELETE FROM "${resource.table}" WHERE id=$1 RETURNING ${returning}`, [params.data.id]);
   if (!result.rows[0]) { res.status(404).json({ error: "Record not found" }); return; }
+  if (resource.table === "product_items") {
+    await cleanupUnreferencedProductImage(req, result.rows[0].image_url);
+  }
   res.sendStatus(204);
 });
 

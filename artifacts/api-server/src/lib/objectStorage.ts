@@ -83,6 +83,17 @@ export class ObjectStorageService {
     return file;
   }
 
+  async deleteObjectEntity(objectPath: string): Promise<void> {
+    const normalizedPath = this.normalizeObjectEntityPath(objectPath);
+    if (!normalizedPath.startsWith("/objects/")) {
+      throw new Error("Only private object storage paths can be deleted");
+    }
+    const { bucketName, objectName } = parseObjectPath(
+      `${this.getPrivateObjectDir()}/${normalizedPath.slice("/objects/".length)}`,
+    );
+    await objectStorageClient.bucket(bucketName).file(objectName).delete({ ignoreNotFound: true });
+  }
+
   async downloadObject(file: File) {
     const [metadata] = await file.getMetadata();
     const stream = Readable.toWeb(file.createReadStream()) as ReadableStream;
