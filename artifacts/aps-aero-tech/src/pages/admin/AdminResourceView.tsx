@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Loader2, Plus, Search, X, Edit, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { ProductEditorFields } from "./ProductEditorFields"
 
 export function AdminResourceView({ params }: { params: { resource: string } }) {
   const { resource } = params
@@ -38,7 +39,7 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
 
   const handleOpenCreate = () => {
     setEditingRow(null)
-    setFormData({})
+    setFormData(resource === "products" ? { categories: [], specs: {}, features: ["Encrypted Comms", "Autonomous", "Mission-Ready"], sort_order: 0, is_active: true } : {})
     setPanelOpen(true)
   }
 
@@ -194,7 +195,9 @@ export function AdminResourceView({ params }: { params: { resource: string } }) 
 
             <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
               <form id="resource-form" onSubmit={handleSave} className="space-y-6">
-                {data.fields.filter(f => f.editable).map(f => (
+                {resource === "products" ? (
+                  <ProductEditorFields formData={formData} setFormData={setFormData} />
+                ) : data.fields.filter(f => f.editable).map(f => (
                   <div key={f.name} className="space-y-2">
                     <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider font-bold">
                       {f.label} {f.required && <span className="text-primary">*</span>}

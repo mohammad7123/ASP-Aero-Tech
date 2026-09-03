@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, ChevronRight, Check, ChevronLeft, MapPin, Gauge, Clock, Weight, Maximize, Mountain, Plane, Ruler, MoveUp } from "lucide-react";
-import { products, productCategories } from "@/data/products";
+import { ArrowRight, ChevronRight, Check, ChevronLeft, MapPin, Gauge, Clock, Weight, Maximize, Mountain, Plane, Ruler, MoveUp, Loader2 } from "lucide-react";
+import { productCategories } from "@/data/products";
+import { useGetProduct, useListProducts } from "@workspace/api-client-react";
+import { productImageUrl } from "@/pages/admin/ProductEditorFields";
 
 const primary = "#D4920C";
 const orange = "#E84821";
@@ -9,6 +11,7 @@ const navy = "#1A1F36";
 const blue = "#3D4FA0";
 
 export function ProductsPage() {
+  const { data: products = [], isLoading, error } = useListProducts();
   useEffect(() => {
     document.title = "UAS Platforms | ASP Aero Tech";
     const meta = document.querySelector('meta[name="description"]');
@@ -72,6 +75,21 @@ export function ProductsPage() {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading && (
+              <div className="col-span-full flex items-center justify-center py-16 text-[#D4920C]">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            )}
+            {error && (
+              <div className="col-span-full rounded-xl border border-red-100 bg-red-50 p-6 text-center text-sm text-red-700">
+                The product catalog is temporarily unavailable. Please try again shortly.
+              </div>
+            )}
+            {!isLoading && !error && filteredProducts.length === 0 && (
+              <div className="col-span-full rounded-xl border border-gray-100 bg-gray-50 p-10 text-center text-gray-500">
+                No published platforms are currently assigned to this mission profile.
+              </div>
+            )}
             {filteredProducts.map(product => (
               <Link 
                 key={product.slug} 
@@ -80,7 +98,7 @@ export function ProductsPage() {
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                   <img 
-                    src={product.image} 
+                    src={productImageUrl(product.image)}
                     alt={product.name} 
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -131,7 +149,7 @@ export function ProductsPage() {
 }
 
 export function ProductDetailPage({ slug }: { slug: string }) {
-  const product = products.find(p => p.slug === slug);
+  const { data: product, isLoading } = useGetProduct(slug);
 
   useEffect(() => {
     if (product) {
@@ -142,6 +160,14 @@ export function ProductDetailPage({ slug }: { slug: string }) {
       }
     }
   }, [product]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center bg-white text-[#D4920C]">
+        <Loader2 className="h-9 w-9 animate-spin" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -198,7 +224,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
           <div className="space-y-8">
             <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 shadow-lg">
               <img 
-                src={product.image} 
+                src={productImageUrl(product.image)}
                 alt={product.name}
                 className="w-full aspect-[4/3] object-cover"
               />

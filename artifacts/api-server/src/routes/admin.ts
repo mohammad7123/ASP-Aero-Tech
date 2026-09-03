@@ -24,6 +24,18 @@ type FieldType = "text" | "textarea" | "url" | "number" | "boolean" | "date" | "
 type Field = { name: string; label: string; type: FieldType; required?: boolean; editable?: boolean };
 type Resource = { table: string; label: string; fields: Field[]; search?: string[]; canCreate?: boolean; canDelete?: boolean };
 type Admin = { id: number; username: string; email: string | null; role: string };
+const productCategories = new Set([
+  "Surveillance",
+  "Photography & Videography",
+  "Agriculture",
+  "Delivery",
+  "Mapping & Surveying",
+  "Inspection",
+  "Search & Rescue",
+  "Military & Defense",
+  "Recreational",
+  "Racing",
+]);
 
 const f = (name: string, label: string, type: FieldType = "text", required = false, editable = true): Field =>
   ({ name, label, type, required, editable });
@@ -34,7 +46,7 @@ const resources: Record<string, Resource> = {
   inquiries: { table: "contact_inquiries", label: "Contact inquiries", canCreate: false, search: ["name", "email", "subject"], fields: [f("id", "ID", "number", false, false), f("name", "Name", "text", true, false), f("email", "Email", "text", true, false), f("phone", "Phone", "text", false, false), f("subject", "Subject", "text", false, false), f("message", "Message", "textarea", true, false), f("is_read", "Read", "boolean"), f("created_at", "Received", "date", false, false)] },
   "hero-slides": { table: "hero_slides", label: "Hero slides", search: ["title", "subtitle"], fields: [f("id", "ID", "number", false, false), f("title", "Title", "text", true), f("subtitle", "Subtitle", "textarea"), f("image_url", "Image URL", "url", true), f("eyebrow", "Eyebrow"), f("badge", "Badge"), f("cta_text", "CTA text"), f("cta_url", "CTA URL", "url"), f("stat1", "Stat 1"), f("stat2", "Stat 2"), f("stat3", "Stat 3"), ...ordered, ...audit] },
   services: { table: "services", label: "Services", search: ["name", "slug", "category"], fields: [f("id", "ID", "number", false, false), f("name", "Name", "text", true), f("slug", "Slug", "text", true), f("category", "Category", "text", true), f("short_desc", "Summary", "textarea", true), f("description", "Description", "textarea"), f("image_url", "Image URL", "url"), f("icon_name", "Icon"), f("accent_color", "Accent color"), ...ordered, ...audit] },
-  products: { table: "product_items", label: "Products", search: ["name", "slug", "category"], fields: [f("id", "ID", "number", false, false), f("category", "Category", "text", true), f("name", "Name", "text", true), f("slug", "Slug", "text", true), f("short_desc", "Summary", "textarea", true), f("description", "Description", "textarea"), f("image_url", "Image URL", "url"), f("icon_name", "Icon"), f("accent_color", "Accent color"), ...ordered, ...audit] },
+  products: { table: "product_items", label: "Products", search: ["name", "slug", "category"], fields: [f("id", "ID", "number", false, false), f("category", "Primary category", "text", true, false), f("name", "Name", "text", true), f("slug", "URL slug", "text", true), f("short_desc", "Summary", "textarea", true), f("description", "Description", "textarea"), f("image_url", "Image", "url"), f("categories", "Mission categories", "json", true), f("specs", "Technical specifications", "json"), f("features", "Features", "json"), f("icon_name", "Icon"), f("accent_color", "Accent color"), ...ordered, ...audit] },
   industries: { table: "industries", label: "Industries", search: ["name", "slug"], fields: [f("id", "ID", "number", false, false), f("name", "Name", "text", true), f("slug", "Slug", "text", true), f("short_desc", "Summary", "textarea", true), f("description", "Description", "textarea"), f("image_url", "Image URL", "url"), f("icon_name", "Icon"), f("accent_color", "Accent color"), ...ordered, ...audit] },
   pages: { table: "pages", label: "Pages", search: ["title", "slug"], fields: [f("id", "ID", "number", false, false), f("title", "Title", "text", true), f("slug", "Slug", "text", true), f("content", "Content", "textarea", true), f("meta_title", "Meta title"), f("meta_description", "Meta description", "textarea"), f("hero_image", "Hero image", "url"), f("is_published", "Published", "boolean"), f("sort_order", "Order", "number"), ...audit] },
   "content-blocks": { table: "page_content_blocks", label: "Content blocks", search: ["page_slug", "block_key", "value"], fields: [f("id", "ID", "number", false, false), f("page_slug", "Page slug", "text", true), f("block_key", "Block key", "text", true), f("value", "Value", "textarea", true), f("updated_at", "Updated", "date", false, false)] },
@@ -71,7 +83,7 @@ const readAdmin = async (req: Request): Promise<Admin | null> => {
   const result = await pool.query<Admin>("SELECT id, username, email, role FROM admin_users WHERE id = $1", [Number(id)]);
   return result.rows[0] ?? null;
 };
-const requireAdmin = async (req: Request, res: Response) => {
+export const requireAdmin = async (req: Request, res: Response) => {
   const admin = await readAdmin(req);
   if (!admin) res.status(401).json({ error: "Authentication required" });
   return admin;
@@ -107,6 +119,17 @@ const parseValues = (r: Resource, input: Record<string, unknown>, create: boolea
     else if (field.type === "json") values[field.name] = typeof value === "string" ? JSON.parse(value) : value;
     else if (field.type === "date") values[field.name] = value ? new Date(String(value)) : null;
     else values[field.name] = value;
+  }
+  if (r.table === "product_items") {
+    const categories = values.categories;
+    if (
+      !Array.isArray(categories) ||
+      categories.length === 0 ||
+      categories.some((category) => typeof category !== "string" || !productCategories.has(category))
+    ) {
+      throw new Error("At least one mission category is required");
+    }
+    values.category = String(categories[0]);
   }
   return values;
 };

@@ -51,6 +51,41 @@ export const CreateInquiryResponse = zod.object({
 
 
 /**
+ * @summary List published drone products
+ */
+export const ListProductsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "description": zod.string(),
+  "image": zod.string().nullable(),
+  "specs": zod.record(zod.string(), zod.string()),
+  "features": zod.array(zod.string()),
+  "categories": zod.array(zod.string())
+})
+export const ListProductsResponse = zod.array(ListProductsResponseItem)
+
+
+/**
+ * @summary Get a published drone product
+ */
+export const GetProductParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetProductResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "description": zod.string(),
+  "image": zod.string().nullable(),
+  "specs": zod.record(zod.string(), zod.string()),
+  "features": zod.array(zod.string()),
+  "categories": zod.array(zod.string())
+})
+
+
+/**
  * @summary List active homepage hero slides
  */
 export const ListHeroSlidesResponseItem = zod.object({
@@ -275,5 +310,45 @@ export const DeleteAdminResourceParams = zod.object({
 })
 
 export const DeleteAdminResourceResponse = zod.void()
+
+
+/**
+ * @summary Request a presigned product image upload URL
+ */
+
+
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+
+
+
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1),
+  "size": zod.number().min(1),
+  "contentType": zod.string().min(1)
+})
+})
+
+
+/**
+ * @summary Serve a stored product image
+ */
+export const GetStorageObjectParams = zod.object({
+  "objectPath": zod.coerce.string()
+})
+
+export const GetStorageObjectResponse = zod.unknown()
 
 

@@ -92,6 +92,35 @@ export interface ErrorResponse {
   error: string;
 }
 
+export type ProductSpecs = {[key: string]: string};
+
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  /** @nullable */
+  image: string | null;
+  specs: ProductSpecs;
+  features: string[];
+  categories: string[];
+}
+
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata: UploadUrlRequest;
+}
+
 export interface AdminUser {
   id: number;
   username: string;

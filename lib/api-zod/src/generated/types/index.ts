@@ -27,3 +27,7 @@ export * from './inquiry';
 export * from './inquiryInput';
 export * from './job';
 export * from './listAdminResourceParams';
+export * from './product';
+export * from './productSpecs';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';
