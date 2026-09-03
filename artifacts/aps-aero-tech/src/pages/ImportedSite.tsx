@@ -1,5 +1,6 @@
 import { FormEvent, ReactNode, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useParams } from "wouter";
+import { ProductsPage, ProductDetailPage } from "./Catalog";
 import {
   ArrowRight,
   Award,
@@ -60,10 +61,10 @@ const serviceItems = [
 ];
 
 const productItems = [
-  { icon: ShieldCheck, label: "ISR PLATFORM", title: "Sentinel VTOL", text: "A mission-configurable VTOL platform for persistent surveillance, reconnaissance, and rapid situational awareness.", color: orange },
-  { icon: Target, label: "TACTICAL UAS", title: "Falcon FPV Series", text: "Agile, operator-focused FPV aircraft designed for close-range observation, training, and tactical field missions.", color: blue },
-  { icon: Factory, label: "INDUSTRIAL UAS", title: "Atlas Inspection", text: "A stable aerial inspection platform for utilities, infrastructure, mining, solar, and difficult-to-access assets.", color: primary },
-  { icon: Sparkles, label: "AUTONOMOUS SYSTEM", title: "Astra Mission Suite", text: "Mission planning, live telemetry, payload control, and fleet intelligence in one secure ground-control environment.", color: "#167C80" },
+  { icon: ShieldCheck, label: "ISR PLATFORM", title: "VTOL Drone", text: "A mission-configurable VTOL platform for persistent surveillance, reconnaissance, and rapid situational awareness.", color: orange, link: "/products/vtol-drone" },
+  { icon: Target, label: "TACTICAL UAS", title: "FPV Drone", text: "Agile, operator-focused FPV aircraft designed for close-range observation, training, and tactical field missions.", color: blue, link: "/products/fpv-drone" },
+  { icon: Factory, label: "INDUSTRIAL UAS", title: "Tethered Drone", text: "A stable aerial inspection platform for utilities, infrastructure, mining, solar, and difficult-to-access assets.", color: primary, link: "/products/tethered-drone" },
+  { icon: Sparkles, label: "AUTONOMOUS SYSTEM", title: "Surveillance Drone", text: "Mission planning, live telemetry, payload control, and fleet intelligence in one secure ground-control environment.", color: "#167C80", link: "/products/surveillance-drone" },
 ];
 
 const industryItems = [
@@ -116,7 +117,7 @@ function LegacyLayout({ children }: { children: ReactNode }) {
                 More <ChevronDown size={14} />
               </button>
               <div className="invisible absolute right-0 top-[62px] w-52 translate-y-2 rounded-xl border border-gray-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                {["/portfolio", "/contact"].map((href) => (
+                {["/products", "/contact"].map((href) => (
                   <Link key={href} href={href} className="block rounded-lg px-3 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-[#D4920C]">
                     {href.slice(1).replace("-", " ").replace(/^\w/, (c) => c.toUpperCase())}
                   </Link>
@@ -242,8 +243,8 @@ function ServiceCard({ icon: Icon, title, text, color }: { icon: typeof Globe2; 
   return <div className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"><div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}16`, color }}><Icon size={22} /></div><h3 className="text-lg font-bold text-[#1A1F36]">{title}</h3><p className="mt-2 text-sm leading-relaxed text-gray-500">{text}</p><span className="mt-5 inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider opacity-0 transition-opacity group-hover:opacity-100" style={{ color }}>Learn more <ArrowRight size={13} /></span></div>;
 }
 
-function ProductCard({ icon: Icon, label, title, text, color }: { icon: typeof Workflow; label: string; title: string; text: string; color: string }) {
-  return <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"><div className="flex items-center justify-between"><div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}16`, color }}><Icon size={23} /></div><span className="text-[9px] font-black tracking-[0.18em]" style={{ color }}>{label}</span></div><h3 className="mt-5 text-lg font-bold text-[#1A1F36]">{title}</h3><p className="mt-2 text-sm leading-relaxed text-gray-500">{text}</p><Link href="/products" className="mt-5 inline-flex items-center gap-1 text-sm font-bold" style={{ color }}>View platform <ChevronRight size={15} /></Link></div>;
+function ProductCard({ icon: Icon, label, title, text, color, link = "/products" }: { icon: typeof Workflow; label: string; title: string; text: string; color: string; link?: string }) {
+  return <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"><div className="flex items-center justify-between"><div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}16`, color }}><Icon size={23} /></div><span className="text-[9px] font-black tracking-[0.18em]" style={{ color }}>{label}</span></div><h3 className="mt-5 text-lg font-bold text-[#1A1F36]">{title}</h3><p className="mt-2 text-sm leading-relaxed text-gray-500">{text}</p><Link href={link} className="mt-5 inline-flex items-center gap-1 text-sm font-bold" style={{ color }}>View platform <ChevronRight size={15} /></Link></div>;
 }
 
 function AboutPage() {
@@ -252,10 +253,6 @@ function AboutPage() {
 
 function ServicesPage() {
   return <><PageHero eyebrow="Engineering capabilities" title={<>Complete UAS development, <span style={{ color: primary }}>integration, and support.</span></>} subtitle="From an operational requirement to a validated aircraft and trained crew, ASP Aero Tech supports the complete unmanned-system lifecycle." image="https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=1200&q=85" /><section className="bg-[#FAFAF8] py-20"><div className="mx-auto max-w-[1440px] px-5 sm:px-8"><SectionHeading eyebrow="Capabilities" title="Every discipline required to put a dependable aircraft in the field." text="Engage us for a focused integration need or a complete development and manufacturing program." /><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{serviceItems.map((item) => <ServiceCard key={item.title} {...item} />)}</div></div></section><section className="bg-white py-20"><div className="mx-auto grid max-w-[1440px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center"><div className="rounded-2xl bg-[#1A1F36] p-8 sm:p-10"><span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: primary }}>Development process</span><h2 className="mt-4 text-3xl font-black text-white">Requirement. Prototype. Validate. Deploy.</h2><p className="mt-4 text-sm leading-relaxed text-white/65">A gated engineering process keeps mission goals, airworthiness, manufacturability, and operator needs aligned from the first system definition through field deployment.</p><div className="mt-8 space-y-5">{["Define mission and system requirements", "Engineer and integrate the aircraft", "Validate, train, and support deployment"].map((step, index) => <div key={step} className="flex items-center gap-4"><span className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-black text-white" style={{ backgroundColor: index === 1 ? orange : primary }}>{index + 1}</span><span className="text-sm font-bold text-white">{step}</span></div>)}</div></div><div><SectionHeading eyebrow="Built around operations" title="Engineering that starts with the mission profile." text="Every deployment environment is different. We balance endurance, payload, communications, portability, autonomy, maintenance, and total lifecycle cost." /><div className="space-y-4">{["Mission-configurable airframe and payload architecture", "Ground and flight validation against defined requirements", "Operator training, maintenance, spares, and upgrades"].map((line) => <div key={line} className="flex items-center gap-3 text-sm font-semibold text-gray-700"><Check size={18} style={{ color: orange }} /> {line}</div>)}</div><Link href="/contact" className="mt-8 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold text-white" style={{ backgroundColor: orange }}>Discuss your mission <ArrowRight size={15} /></Link></div></div></section></>;
-}
-
-function ProductsPage() {
-  return <><PageHero eyebrow="Unmanned aerial platforms" title={<>Modular aircraft for <span style={{ color: primary }}>mission-critical operations.</span></>} subtitle="ASP Aero Tech develops configurable UAS platforms spanning persistent ISR, tactical awareness, industrial inspection, and autonomous field operations." image="https://images.unsplash.com/photo-1508444845599-5c89863b1c44?auto=format&fit=crop&w=1200&q=85" /><section className="bg-white py-20"><div className="mx-auto max-w-[1440px] px-5 sm:px-8"><SectionHeading eyebrow="ASP Aero Tech portfolio" title="Choose a platform. Configure it for the mission." text="Payload, datalink, endurance, mobility, autonomy, and ground-control options are aligned to deployment needs." /><div className="grid gap-5 md:grid-cols-2">{productItems.map((item) => <div key={item.title} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-[#FAFAF8] p-7 transition-all hover:-translate-y-1 hover:shadow-lg"><div className="absolute right-0 top-0 h-28 w-28 rounded-bl-full opacity-20" style={{ backgroundColor: item.color }} /><div className="relative"><div className="flex items-center justify-between"><div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${item.color}18`, color: item.color }}><item.icon size={23} /></div><span className="text-[10px] font-black tracking-[0.2em]" style={{ color: item.color }}>{item.label}</span></div><h3 className="mt-8 text-2xl font-black text-[#1A1F36]">{item.title}</h3><p className="mt-3 max-w-lg text-sm leading-relaxed text-gray-600">{item.text}</p><ul className="mt-6 grid gap-2 sm:grid-cols-2">{["Modular payload bay", "Secure live telemetry", "Rapid field deployment", "Training & support"].map((feature) => <li key={feature} className="flex items-center gap-2 text-xs font-semibold text-gray-600"><Check size={14} style={{ color: item.color }} />{feature}</li>)}</ul><Link href="/contact" className="mt-7 inline-flex items-center gap-2 text-sm font-bold" style={{ color: item.color }}>Request platform details <ArrowRight size={15} /></Link></div></div>)}</div></div></section><section className="bg-[#F6F1E8] py-20"><div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-7 px-5 sm:px-8 md:flex-row md:items-center"><div><span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: orange }}>Need a custom configuration?</span><h2 className="mt-2 text-3xl font-black text-[#1A1F36]">Define the operating envelope with our engineers.</h2><p className="mt-3 text-sm text-gray-600">Share the mission, payload, range, endurance, and deployment conditions to identify the right system architecture.</p></div><Link href="/contact" className="inline-flex shrink-0 items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold text-white" style={{ backgroundColor: orange }}>Request a briefing <ArrowRight size={15} /></Link></div></section></>;
 }
 
 function IndustriesPage() {
@@ -284,10 +281,13 @@ function Field({ label, name, type = "text", required = false }: { label: string
 
 export function ImportedSite() {
   const [location] = useLocation();
+  const params = useParams();
+
   let page: ReactNode = <HomePage />;
   if (location === "/about") page = <AboutPage />;
   else if (location === "/services") page = <ServicesPage />;
   else if (location === "/products") page = <ProductsPage />;
+  else if (location.startsWith("/products/") && params.slug) page = <ProductDetailPage slug={params.slug} />;
   else if (location === "/industries") page = <IndustriesPage />;
   else if (location === "/contact") page = <ContactPage />;
   return <LegacyLayout>{page}</LegacyLayout>;

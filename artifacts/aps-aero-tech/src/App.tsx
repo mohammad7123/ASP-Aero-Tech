@@ -29,6 +29,7 @@ function Router() {
         <Route path="/about" component={ImportedSite} />
         <Route path="/services" component={ImportedSite} />
         <Route path="/products" component={ImportedSite} />
+        <Route path="/products/:slug" component={ImportedSite} />
         <Route path="/industries" component={ImportedSite} />
         <Route path="/contact" component={ImportedSite} />
         <Route path="/" component={ImportedSite} />
