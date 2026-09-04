@@ -45,38 +45,41 @@
 }
 
 :root, .dark {
-  --background: 222 47% 5%;
-  --foreground: 210 40% 98%;
+  /* Defaulting to a clean light aesthetic as a base, with dark mode falling back to Deep Navy */
+  --background: 0 0% 100%;
+  --foreground: 215 70% 14%;
   
-  --card: 222 47% 8%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 222 20% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 70% 14%;
+  --card-border: 215 20% 90%;
   
-  --popover: 222 47% 8%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 222 20% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 70% 14%;
+  --popover-border: 215 20% 90%;
   
-  /* Tactical Cyan */
-  --primary: 186 100% 45%;
-  --primary-foreground: 222 47% 5%;
+  /* Deep Navy */
+  --primary: 215 70% 14%; /* #0B203D */
+  --primary-foreground: 0 0% 100%;
   
-  --secondary: 222 20% 15%;
-  --secondary-foreground: 210 40% 98%;
+  /* Saffron Orange */
+  --secondary: 27 92% 54%; /* #F47E20 */
+  --secondary-foreground: 0 0% 100%;
   
-  --muted: 222 20% 15%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 215 20% 95%;
+  --muted-foreground: 215 20% 45%;
   
-  --accent: 186 100% 45%;
-  --accent-foreground: 222 47% 5%;
+  /* Indian Green */
+  --accent: 115 89% 28%; /* #138808 */
+  --accent-foreground: 0 0% 100%;
   
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 0 0% 100%;
   
-  --border: 222 20% 15%;
-  --input: 222 20% 15%;
-  --ring: 186 100% 45%;
+  --border: 215 20% 90%;
+  --input: 215 20% 90%;
+  --ring: 27 92% 54%;
   
-  --radius: 0rem; 
+  --radius: 0.5rem;
 }
 
 @layer base {
@@ -84,7 +87,7 @@
     @apply border-border;
   }
   body {
-    @apply font-sans antialiased bg-background text-foreground selection:bg-primary/30;
+    @apply font-sans antialiased bg-background text-foreground selection:bg-secondary/30;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight;
@@ -113,5 +116,5 @@
 }
 
 .legacy-site ::selection {
-  background: rgba(232, 72, 33, 0.2);
+  background: rgba(244, 126, 32, 0.2);
 }

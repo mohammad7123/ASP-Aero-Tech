@@ -5,10 +5,10 @@ import { productCategories } from "@/data/products";
 import { useGetProduct, useListProducts } from "@workspace/api-client-react";
 import { productImageUrl } from "@/pages/admin/ProductEditorFields";
 
-const primary = "#D4920C";
-const orange = "#E84821";
-const navy = "#1A1F36";
-const blue = "#3D4FA0";
+const primary = "#F47E20";
+const orange = "#F47E20";
+const navy = "#0B203D";
+const blue = "#138808";
 
 export function ProductsPage() {
   const { data: products = [], isLoading, error } = useListProducts();
@@ -26,7 +26,7 @@ export function ProductsPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[#1A1F36]">
+      <section className="relative overflow-hidden bg-[#0B203D]">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(120deg, transparent 0%, rgba(212,146,12,.45) 100%)" }} />
         <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-16 sm:px-8 md:py-20 lg:py-24">
           <div className="max-w-3xl">
@@ -52,8 +52,8 @@ export function ProductsPage() {
                 onClick={() => setActiveCategory(cat)}
                 className={`whitespace-nowrap px-4 py-2 text-sm font-bold transition-colors rounded-lg border ${
                   activeCategory === cat 
-                    ? "bg-[#D4920C] text-white border-[#D4920C]" 
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#D4920C] hover:text-[#D4920C]"
+                    ? "bg-[#F47E20] text-white border-[#F47E20]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#F47E20] hover:text-[#F47E20]"
                 }`}
               >
                 {cat}
@@ -66,7 +66,7 @@ export function ProductsPage() {
       <section className="bg-white py-16">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
           <div className="mb-10">
-            <h2 className="text-2xl font-black text-[#1A1F36]">
+            <h2 className="text-2xl font-black text-[#0B203D]">
               {activeCategory} Platforms
             </h2>
             <p className="mt-2 text-gray-600 text-sm">
@@ -76,7 +76,7 @@ export function ProductsPage() {
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {isLoading && (
-              <div className="col-span-full flex items-center justify-center py-16 text-[#D4920C]">
+              <div className="col-span-full flex items-center justify-center py-16 text-[#F47E20]">
                 <Loader2 className="h-8 w-8 animate-spin" />
               </div>
             )}
@@ -102,7 +102,7 @@ export function ProductsPage() {
                     alt={product.name} 
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1A1F36]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B203D]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="absolute bottom-4 left-4 flex gap-2 opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
                     <span className="inline-flex items-center gap-1 rounded bg-white/20 backdrop-blur-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
                       View specifications <ChevronRight size={12} />
@@ -110,7 +110,7 @@ export function ProductsPage() {
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col p-6">
-                  <h3 className="text-xl font-black text-[#1A1F36]">{product.name}</h3>
+                  <h3 className="text-xl font-black text-[#0B203D]">{product.name}</h3>
                   <p className="mt-2 text-sm text-gray-500 line-clamp-2">{product.description}</p>
                   
                   <div className="mt-6 flex flex-wrap gap-2">
@@ -136,7 +136,7 @@ export function ProductsPage() {
         <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-7 px-5 sm:px-8 md:flex-row md:items-center">
           <div>
             <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: orange }}>Need a custom configuration?</span>
-            <h2 className="mt-2 text-3xl font-black text-[#1A1F36]">Define the operating envelope with our engineers.</h2>
+            <h2 className="mt-2 text-3xl font-black text-[#0B203D]">Define the operating envelope with our engineers.</h2>
             <p className="mt-3 text-sm text-gray-600">Share the mission, payload, range, endurance, and deployment conditions to identify the right system architecture.</p>
           </div>
           <Link href="/contact" className="inline-flex shrink-0 items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5" style={{ backgroundColor: orange }}>
@@ -163,7 +163,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-white text-[#D4920C]">
+      <div className="flex min-h-[60vh] items-center justify-center bg-white text-[#F47E20]">
         <Loader2 className="h-9 w-9 animate-spin" />
       </div>
     );
@@ -172,7 +172,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
   if (!product) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-white px-5 text-center">
-        <h1 className="text-3xl font-black text-[#1A1F36]">Platform not found</h1>
+        <h1 className="text-3xl font-black text-[#0B203D]">Platform not found</h1>
         <p className="mt-4 text-gray-500">The requested UAS platform could not be located.</p>
         <Link href="/products" className="mt-6 inline-flex items-center gap-2 font-bold" style={{ color: primary }}>
           <ChevronLeft size={16} /> Return to portfolio
@@ -210,11 +210,11 @@ export function ProductDetailPage({ slug }: { slug: string }) {
       {/* Breadcrumb */}
       <div className="border-b border-gray-100 bg-[#FAFAF8]">
         <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-5 py-4 sm:px-8 text-xs font-semibold text-gray-500">
-          <Link href="/products" className="hover:text-[#D4920C] transition-colors flex items-center gap-1">
+          <Link href="/products" className="hover:text-[#F47E20] transition-colors flex items-center gap-1">
             <ChevronLeft size={14} /> Platforms
           </Link>
           <span>/</span>
-          <span className="text-[#1A1F36]">{product.name}</span>
+          <span className="text-[#0B203D]">{product.name}</span>
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
                 alt={product.name}
                 className="w-full aspect-[4/3] object-cover"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-[#1A1F36]/90 backdrop-blur border-t border-white/10">
+              <div className="absolute bottom-0 left-0 right-0 bg-[#0B203D]/90 backdrop-blur border-t border-white/10">
                 <div className="flex divide-x divide-white/10 text-center">
                   {product.features.map(feature => (
                     <div key={feature} className="flex-1 py-3 px-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
@@ -254,7 +254,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
             <span className="mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em]" style={{ color: primary }}>
               <span className="h-0.5 w-6" style={{ backgroundColor: primary }} /> Platform Detail
             </span>
-            <h1 className="text-4xl font-black text-[#1A1F36] sm:text-5xl">{product.name}</h1>
+            <h1 className="text-4xl font-black text-[#0B203D] sm:text-5xl">{product.name}</h1>
             <p className="mt-6 text-lg leading-relaxed text-gray-600">{product.description}</p>
             
             <div className="mt-10 rounded-2xl border border-gray-100 bg-[#FAFAF8] p-8 shadow-sm">
@@ -275,7 +275,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
                         <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">
                           {specLabels[specKey]}
                         </div>
-                        <div className="mt-1 font-bold text-[#1A1F36]">{value}</div>
+                        <div className="mt-1 font-bold text-[#0B203D]">{value}</div>
                       </div>
                     </div>
                   );

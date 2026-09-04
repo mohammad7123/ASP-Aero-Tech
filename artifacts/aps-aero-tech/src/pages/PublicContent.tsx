@@ -18,8 +18,8 @@ import {
   useListPublishedBlogPosts,
 } from "@workspace/api-client-react";
 
-const primary = "#D4920C";
-const orange = "#E84821";
+const primary = "#F47E20";
+const orange = "#F47E20";
 
 function usePageMetadata(title: string, description: string) {
   useEffect(() => {
@@ -43,11 +43,11 @@ function ContentHero({
   text: string;
 }) {
   return (
-    <section className="relative overflow-hidden bg-[#1A1F36]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,rgba(212,146,12,.25),transparent_30%),linear-gradient(120deg,#1A1F36,#252C51)]" />
+    <section className="relative overflow-hidden bg-[#0B203D]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,rgba(212,146,12,.25),transparent_30%),linear-gradient(120deg,#0B203D,#252C51)]" />
       <div className="relative mx-auto max-w-[1440px] px-5 py-16 sm:px-8 md:py-24">
-        <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-[#D4920C]">
-          <span className="h-0.5 w-7 bg-[#D4920C]" /> {eyebrow}
+        <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-[#F47E20]">
+          <span className="h-0.5 w-7 bg-[#F47E20]" /> {eyebrow}
         </span>
         <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
           {title}
@@ -93,16 +93,16 @@ export function CareersPage() {
               [MapPin, "Made in India", "Strengthen indigenous unmanned aerial capability."],
             ].map(([Icon, title, text]) => (
               <div key={String(title)} className="rounded-2xl bg-[#FAFAF8] p-6">
-                <Icon className="text-[#E84821]" size={22} />
-                <h2 className="mt-4 font-bold text-[#1A1F36]">{String(title)}</h2>
+                <Icon className="text-[#F47E20]" size={22} />
+                <h2 className="mt-4 font-bold text-[#0B203D]">{String(title)}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-gray-500">{String(text)}</p>
               </div>
             ))}
           </div>
 
           <div className="mb-8">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-[#D4920C]">Open roles</span>
-            <h2 className="mt-3 text-3xl font-black text-[#1A1F36] sm:text-4xl">Find your next mission.</h2>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-[#F47E20]">Open roles</span>
+            <h2 className="mt-3 text-3xl font-black text-[#0B203D] sm:text-4xl">Find your next mission.</h2>
           </div>
 
           {isLoading ? (
@@ -124,11 +124,11 @@ export function CareersPage() {
                       <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider text-gray-500">
                         <span>{job.department}</span><span aria-hidden>•</span><span>{job.type}</span>
                       </div>
-                      <h3 className="mt-3 text-2xl font-black text-[#1A1F36]">{job.title}</h3>
+                      <h3 className="mt-3 text-2xl font-black text-[#0B203D]">{job.title}</h3>
                       <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600">{job.description}</p>
                       {job.requirements && (
                         <details className="mt-5">
-                          <summary className="cursor-pointer text-sm font-bold text-[#D4920C]">View requirements</summary>
+                          <summary className="cursor-pointer text-sm font-bold text-[#F47E20]">View requirements</summary>
                           <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600">{job.requirements}</p>
                         </details>
                       )}
@@ -140,7 +140,7 @@ export function CareersPage() {
                       {job.salaryRange && <p className="mt-2 text-sm font-semibold text-gray-600">{job.salaryRange}</p>}
                       <Link
                         href="/contact"
-                        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#E84821] px-5 py-3 text-sm font-bold text-white"
+                        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#F47E20] px-5 py-3 text-sm font-bold text-white"
                         data-testid={`link-apply-job-${job.id}`}
                       >
                         Apply for this role <ArrowRight size={15} />
@@ -152,12 +152,12 @@ export function CareersPage() {
             </div>
           ) : (
             <div className="rounded-2xl border border-gray-100 bg-[#FAFAF8] px-6 py-14 text-center">
-              <BriefcaseBusiness className="mx-auto text-[#D4920C]" size={34} />
-              <h3 className="mt-5 text-xl font-black text-[#1A1F36]">No open roles right now.</h3>
+              <BriefcaseBusiness className="mx-auto text-[#F47E20]" size={34} />
+              <h3 className="mt-5 text-xl font-black text-[#0B203D]">No open roles right now.</h3>
               <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-gray-500">
                 New opportunities will appear here when published by our team. You can still introduce yourself for future roles.
               </p>
-              <Link href="/contact" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#E84821]">
+              <Link href="/contact" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#F47E20]">
                 Contact our team <ArrowRight size={15} />
               </Link>
             </div>
@@ -199,8 +199,8 @@ export function BlogPage() {
                   {post.featuredImage ? (
                     <img src={post.featuredImage} alt="" className="h-52 w-full object-cover" />
                   ) : (
-                    <div className="flex h-52 items-center justify-center bg-[#1A1F36]">
-                      <Newspaper className="text-[#D4920C]" size={38} />
+                    <div className="flex h-52 items-center justify-center bg-[#0B203D]">
+                      <Newspaper className="text-[#F47E20]" size={38} />
                     </div>
                   )}
                   <div className="p-6">
@@ -212,9 +212,9 @@ export function BlogPage() {
                         </span>
                       )}
                     </div>
-                    <h2 className="mt-3 text-xl font-black leading-snug text-[#1A1F36]">{post.title}</h2>
+                    <h2 className="mt-3 text-xl font-black leading-snug text-[#0B203D]">{post.title}</h2>
                     {post.excerpt && <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-500">{post.excerpt}</p>}
-                    <Link href={`/blog/${post.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#E84821]">
+                    <Link href={`/blog/${post.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#F47E20]">
                       Read article <ArrowRight size={14} />
                     </Link>
                   </div>
@@ -223,8 +223,8 @@ export function BlogPage() {
             </div>
           ) : (
             <div className="rounded-2xl bg-white px-6 py-16 text-center shadow-sm">
-              <Newspaper className="mx-auto text-[#D4920C]" size={38} />
-              <h2 className="mt-5 text-2xl font-black text-[#1A1F36]">Insights are preparing for take-off.</h2>
+              <Newspaper className="mx-auto text-[#F47E20]" size={38} />
+              <h2 className="mt-5 text-2xl font-black text-[#0B203D]">Insights are preparing for take-off.</h2>
               <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-gray-500">
                 Published articles will appear here automatically when released through the ASP Aero Tech admin panel.
               </p>
@@ -258,7 +258,7 @@ export function BlogDetailPage({ slug }: { slug: string }) {
     return (
       <section className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-5 py-20 text-center sm:px-8">
         <Newspaper size={38} color={primary} />
-        <h1 className="mt-5 text-3xl font-black text-[#1A1F36]">Article not found.</h1>
+        <h1 className="mt-5 text-3xl font-black text-[#0B203D]">Article not found.</h1>
         <p className="mt-3 text-gray-500">This article may be unpublished or no longer available.</p>
         <Link href="/blog" className="mt-7 inline-flex items-center gap-2 font-bold" style={{ color: orange }}>
           Return to insights <ArrowRight size={15} />
@@ -269,7 +269,7 @@ export function BlogDetailPage({ slug }: { slug: string }) {
 
   return (
     <article>
-      <section className="bg-[#1A1F36]">
+      <section className="bg-[#0B203D]">
         <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8 md:py-24">
           <div className="flex flex-wrap gap-3 text-xs font-bold uppercase tracking-wider text-white/50">
             {post.category && <span>{post.category}</span>}
@@ -288,7 +288,7 @@ export function BlogDetailPage({ slug }: { slug: string }) {
             {post.content.split(/\n{2,}/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
           <div className="mt-12 border-t border-gray-100 pt-8">
-            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-[#E84821]">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-[#F47E20]">
               View all insights <ArrowRight size={14} />
             </Link>
           </div>

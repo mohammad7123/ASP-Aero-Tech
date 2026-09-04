@@ -52,7 +52,7 @@ export function DynamicHero() {
 
   return (
     <section
-      className="relative min-h-[610px] overflow-hidden bg-[#1A1F36] sm:min-h-[660px] lg:min-h-[690px]"
+      className="relative min-h-[610px] overflow-hidden bg-[#0B203D] sm:min-h-[660px] lg:min-h-[690px]"
       aria-roledescription="carousel"
       aria-label="ASP Aero Tech highlights"
       data-testid="section-dynamic-hero"
@@ -71,16 +71,16 @@ export function DynamicHero() {
             className="h-full w-full object-cover"
             data-testid={`img-hero-${item.id}`}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,20,42,.98)_0%,rgba(26,31,54,.9)_43%,rgba(26,31,54,.35)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(26,31,54,.75)_0%,transparent_55%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,20,40,.98)_0%,rgba(11,32,61,.9)_43%,rgba(11,32,61,.35)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(11,32,61,.75)_0%,transparent_55%)]" />
         </div>
       ))}
 
       <div className="relative mx-auto flex min-h-[610px] max-w-[1440px] items-center px-5 py-20 sm:min-h-[660px] sm:px-8 lg:min-h-[690px]">
         <div className="max-w-3xl">
           <div className="mb-5 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#D4920C]">
-              <span className="h-0.5 w-8 bg-[#D4920C]" />
+            <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#F47E20]">
+              <span className="h-0.5 w-8 bg-[#F47E20]" />
               {slide.eyebrow || "ASP Aero Tech"}
             </span>
             {slide.badge && (
@@ -103,7 +103,7 @@ export function DynamicHero() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href={safeLink(slide.ctaUrl)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#E84821] px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-transform hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#F47E20] px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-transform hover:-translate-y-0.5"
               data-testid="link-hero-primary"
             >
               {slide.ctaText || "Request a briefing"} <ArrowRight size={16} />
@@ -119,7 +119,7 @@ export function DynamicHero() {
           <div className="mt-10 grid max-w-2xl gap-3 text-xs font-bold uppercase tracking-wider text-white/55 sm:grid-cols-3">
             {[slide.stat1, slide.stat2, slide.stat3].filter(Boolean).map((stat) => (
               <span key={stat} className="flex items-start gap-2">
-                <Check className="mt-0.5 shrink-0 text-[#D4920C]" size={14} />
+                <Check className="mt-0.5 shrink-0 text-[#F47E20]" size={14} />
                 {stat}
               </span>
             ))}
@@ -136,7 +136,7 @@ export function DynamicHero() {
                 type="button"
                 onClick={() => goTo(index)}
                 className={`h-1.5 rounded-full transition-all ${
-                  index === activeIndex ? "w-10 bg-[#D4920C]" : "w-5 bg-white/35 hover:bg-white/60"
+                  index === activeIndex ? "w-10 bg-[#F47E20]" : "w-5 bg-white/35 hover:bg-white/60"
                 }`}
                 aria-label={`Show slide ${index + 1}`}
                 aria-current={index === activeIndex}
@@ -148,7 +148,7 @@ export function DynamicHero() {
             <button
               type="button"
               onClick={() => goTo(activeIndex - 1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1F36]/50 text-white backdrop-blur transition-colors hover:bg-white/15"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#0B203D]/50 text-white backdrop-blur transition-colors hover:bg-white/15"
               aria-label="Previous hero slide"
               data-testid="button-hero-previous"
             >
@@ -157,7 +157,7 @@ export function DynamicHero() {
             <button
               type="button"
               onClick={() => goTo(activeIndex + 1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#1A1F36]/50 text-white backdrop-blur transition-colors hover:bg-white/15"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#0B203D]/50 text-white backdrop-blur transition-colors hover:bg-white/15"
               aria-label="Next hero slide"
               data-testid="button-hero-next"
             >

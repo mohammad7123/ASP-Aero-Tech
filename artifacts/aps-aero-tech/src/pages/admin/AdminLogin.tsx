@@ -34,7 +34,7 @@ export function AdminLogin({ onWantsSetup }: { onWantsSetup: () => void }) {
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-10">
-          <Shield className="w-16 h-16 text-primary mx-auto mb-6" />
+          <img src="/asp-logo.png" alt="ASP Aero Tech" className="h-24 mx-auto mb-6 object-contain" />
           <h1 className="text-3xl font-display font-bold tracking-widest text-foreground uppercase mb-2">Command Center</h1>
           <p className="text-muted-foreground font-mono text-sm">IDENTIFY YOURSELF TO PROCEED</p>
         </div>

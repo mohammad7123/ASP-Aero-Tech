@@ -5,7 +5,7 @@ export function Hero() {
     <section className="relative min-h-[100dvh] flex items-center pt-20 overflow-hidden">
       {/* Background element */}
       <div className="absolute inset-0 z-0 opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00E5FF12_1px,transparent_1px),linear-gradient(to_bottom,#00E5FF12_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#F47E2012_1px,transparent_1px),linear-gradient(to_bottom,#13880812_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid lg:grid-cols-2 gap-12 items-center">

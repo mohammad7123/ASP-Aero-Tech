@@ -45,7 +45,7 @@ export function Contact() {
 
   return (
     <section id="contact" className="py-24 bg-background border-t border-white/5 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#00e5ff0a_1px,transparent_1px),linear-gradient(to_bottom,#00e5ff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F47E200a_1px,transparent_1px),linear-gradient(to_bottom,#1388080a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50 pointer-events-none" />
       
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16">

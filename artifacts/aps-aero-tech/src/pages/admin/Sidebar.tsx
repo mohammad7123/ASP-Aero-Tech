@@ -29,10 +29,10 @@ export function Sidebar() {
     <aside className="w-64 border-r border-border bg-card shrink-0 flex flex-col h-screen overflow-hidden hidden md:flex relative">
       <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-primary/50 to-transparent pointer-events-none" />
       
-      <div className="h-16 border-b border-border flex items-center px-6 shrink-0 relative overflow-hidden">
+      <div className="h-20 border-b border-border flex items-center px-6 shrink-0 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5" />
-        <Link href="/" className="font-display font-bold text-xl tracking-widest uppercase text-foreground relative z-10 hover:text-primary transition-colors">
-          ASP AERTECH
+        <Link href="/" className="relative z-10 flex items-center h-full">
+          <img src="/asp-logo.png" alt="ASP Aero Tech" className="h-10 w-auto object-contain hover:opacity-80 transition-opacity" />
         </Link>
       </div>
 
