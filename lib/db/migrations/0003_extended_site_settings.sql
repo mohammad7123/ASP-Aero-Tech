@@ -1,0 +1,19 @@
+-- Extended protected configuration for ASP Aero Tech.
+ALTER TABLE site_settings
+  ADD COLUMN IF NOT EXISTS site_url TEXT,
+  ADD COLUMN IF NOT EXISTS chatbot_model TEXT,
+  ADD COLUMN IF NOT EXISTS smtp_host TEXT,
+  ADD COLUMN IF NOT EXISTS smtp_port INTEGER,
+  ADD COLUMN IF NOT EXISTS smtp_username TEXT,
+  ADD COLUMN IF NOT EXISTS smtp_password_encrypted TEXT,
+  ADD COLUMN IF NOT EXISTS smtp_from_address TEXT,
+  ADD COLUMN IF NOT EXISTS sms_provider TEXT,
+  ADD COLUMN IF NOT EXISTS sms_api_key_encrypted TEXT,
+  ADD COLUMN IF NOT EXISTS sms_sender_id TEXT,
+  ADD COLUMN IF NOT EXISTS whatsapp_provider TEXT,
+  ADD COLUMN IF NOT EXISTS whatsapp_api_key_encrypted TEXT,
+  ADD COLUMN IF NOT EXISTS ai_provider TEXT,
+  ADD COLUMN IF NOT EXISTS ai_api_key_encrypted TEXT,
+  ADD COLUMN IF NOT EXISTS ai_model TEXT,
+  ADD COLUMN IF NOT EXISTS ai_base_url TEXT,
+  ADD COLUMN IF NOT EXISTS analytics_id TEXT;

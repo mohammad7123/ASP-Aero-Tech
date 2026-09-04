@@ -135,6 +135,8 @@ export interface SiteSettings {
   /** @nullable */
   description?: string | null;
   /** @nullable */
+  siteUrl?: string | null;
+  /** @nullable */
   logoUrl?: string | null;
   /** @nullable */
   faviconUrl?: string | null;
@@ -179,12 +181,64 @@ export interface SiteSettings {
   /** @nullable */
   chatbotGreeting?: string | null;
   /** @nullable */
+  chatbotModel?: string | null;
+  /** @nullable */
+  smtpHost?: string | null;
+  /** @nullable */
+  smtpPort?: number | null;
+  /** @nullable */
+  smtpUsername?: string | null;
+  /** @nullable */
+  smtpPassword?: string | null;
+  /** @nullable */
+  smtpPasswordSet?: boolean | null;
+  /** @nullable */
+  smtpFromAddress?: string | null;
+  /** @nullable */
+  smsProvider?: string | null;
+  /** @nullable */
+  smsApiKey?: string | null;
+  /** @nullable */
+  smsApiKeySet?: boolean | null;
+  /** @nullable */
+  smsSenderId?: string | null;
+  /** @nullable */
+  whatsappProvider?: string | null;
+  /** @nullable */
+  whatsappApiKey?: string | null;
+  /** @nullable */
+  whatsappApiKeySet?: boolean | null;
+  /** @nullable */
+  aiProvider?: string | null;
+  /** @nullable */
+  aiApiKey?: string | null;
+  /** @nullable */
+  aiApiKeySet?: boolean | null;
+  /** @nullable */
+  aiModel?: string | null;
+  /** @nullable */
+  aiBaseUrl?: string | null;
+  /** @nullable */
+  analyticsId?: string | null;
+  /** @nullable */
   bannerHeight?: number | null;
   /** @nullable */
   bannerSpeed?: number | null;
 }
 
 export type SiteSettingsInput = SiteSettings;
+
+export interface ChatbotMessageInput {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  message: string;
+}
+
+export interface ChatbotMessageResponse {
+  reply: string;
+}
 
 export type CampaignType = typeof CampaignType[keyof typeof CampaignType];
 

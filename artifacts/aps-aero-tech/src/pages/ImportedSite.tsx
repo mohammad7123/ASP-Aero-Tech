@@ -24,6 +24,7 @@ import {
   Instagram,
   Lightbulb,
   Linkedin,
+  Loader2,
   Mail,
   MapPin,
   Menu,
@@ -35,6 +36,7 @@ import {
   Phone,
   Quote,
   Rocket,
+  Send,
   ShieldCheck,
   ShoppingBag,
   Smartphone,
@@ -51,6 +53,7 @@ import {
   useCreateInquiry,
   useGetPublicSettings,
   useListPublishedBlogPosts,
+  useSendChatbotMessage,
   getListPublishedBlogPostsQueryKey
 } from "@workspace/api-client-react";
 
@@ -101,8 +104,23 @@ const industryItems = [
 // Helper components
 function ChatbotWidget({ settings }: { settings: any }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Array<{ role: "assistant" | "user"; text: string }>>([]);
+  const sendMessage = useSendChatbotMessage();
 
   if (!settings?.chatbotEnabled) return null;
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const text = message.trim();
+    if (!text || sendMessage.isPending) return;
+    setMessages((current) => [...current, { role: "user", text }]);
+    setMessage("");
+    sendMessage.mutate({ data: { message: text } }, {
+      onSuccess: (result) => setMessages((current) => [...current, { role: "assistant", text: result.reply }]),
+      onError: () => setMessages((current) => [...current, { role: "assistant", text: "I’m unable to respond right now. Please contact our team and we’ll help you directly." }]),
+    });
+  };
 
   return (
     <>
@@ -120,16 +138,23 @@ function ChatbotWidget({ settings }: { settings: any }) {
             <h3 className="font-bold">{settings.chatbotName || "ASP Support"}</h3>
             <span className="text-xs opacity-75">Automated Assistant</span>
           </div>
-          <div className="p-4 bg-gray-50 h-64 overflow-y-auto">
+           <div className="space-y-3 p-4 bg-gray-50 h-72 overflow-y-auto">
             <div className="bg-white p-3 rounded-lg rounded-tl-none shadow-sm text-sm text-gray-700 max-w-[85%] border border-gray-100">
               {settings.chatbotGreeting || "Hello. How can I assist you with your mission requirements today?"}
             </div>
+             {messages.map((item, index) => (
+               <div key={`${item.role}-${index}`} className={`max-w-[85%] rounded-lg p-3 text-sm shadow-sm ${item.role === "user" ? "ml-auto rounded-tr-none text-white" : "rounded-tl-none border border-gray-100 bg-white text-gray-700"}`} style={item.role === "user" ? { backgroundColor: "var(--secondary-color, #0B203D)" } : undefined}>
+                 {item.text}
+               </div>
+             ))}
+             {sendMessage.isPending && <div className="flex items-center gap-2 text-xs text-gray-500"><Loader2 size={14} className="animate-spin" /> Thinking…</div>}
           </div>
-          <div className="p-3 bg-white border-t border-gray-100">
-            <div className="text-xs text-center text-gray-500 mb-2">Live chat is currently disconnected.</div>
-            <Link href="/contact" onClick={() => setIsOpen(false)} className="block w-full py-2 text-center text-sm font-bold text-white rounded" style={{ backgroundColor: "var(--primary-color, #F47E20)" }}>
-              Contact our team
-            </Link>
+           <div className="p-3 bg-white border-t border-gray-100">
+             <form onSubmit={submit} className="flex gap-2">
+               <input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} placeholder="Ask about our drone solutions…" aria-label="Chat message" className="min-w-0 flex-1 rounded border border-gray-200 px-3 py-2 text-sm text-gray-800 outline-none focus:border-orange-400" />
+               <button type="submit" disabled={!message.trim() || sendMessage.isPending} aria-label="Send message" className="flex h-10 w-10 items-center justify-center rounded text-white disabled:opacity-50" style={{ backgroundColor: "var(--primary-color, #F47E20)" }}><Send size={17} /></button>
+             </form>
+             <Link href="/contact" onClick={() => setIsOpen(false)} className="mt-2 block text-center text-xs font-semibold text-gray-500 hover:text-orange-500">Contact our team</Link>
           </div>
         </div>
       )}
@@ -181,6 +206,37 @@ function LegacyLayout({ children }: { children: ReactNode }) {
       }
     }
   }, [settings]);
+
+  useEffect(() => {
+    const syncAnalytics = () => {
+      const id = settings?.analyticsId;
+      let consent = false;
+      try {
+        consent = Boolean(JSON.parse(localStorage.getItem("asp_cookie_consent") || "{}").analytics);
+      } catch {
+        consent = false;
+      }
+      const existing = document.getElementById("asp-google-analytics");
+      if (!id || !consent) {
+        existing?.remove();
+        return;
+      }
+      if (existing) return;
+      const script = document.createElement("script");
+      script.id = "asp-google-analytics";
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+      document.head.appendChild(script);
+      const analyticsWindow = window as Window & { dataLayer?: unknown[][] };
+      analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
+      const gtag = (...args: unknown[]) => analyticsWindow.dataLayer?.push(args);
+      gtag("js", new Date());
+      gtag("config", id);
+    };
+    syncAnalytics();
+    window.addEventListener("asp-cookie-consent-changed", syncAnalytics);
+    return () => window.removeEventListener("asp-cookie-consent-changed", syncAnalytics);
+  }, [settings?.analyticsId]);
 
   const siteName = settings?.siteName || "ASP Aero Tech";
   const logoUrl = settings?.logoUrl || "/asp-logo.png";

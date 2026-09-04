@@ -62,6 +62,7 @@ export const GetPublicSettingsResponse = zod.object({
   "siteName": zod.string().nullish(),
   "tagline": zod.string().nullish(),
   "description": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
@@ -84,6 +85,26 @@ export const GetPublicSettingsResponse = zod.object({
   "chatbotEnabled": zod.boolean().nullish(),
   "chatbotName": zod.string().nullish(),
   "chatbotGreeting": zod.string().nullish(),
+  "chatbotModel": zod.string().nullish(),
+  "smtpHost": zod.string().nullish(),
+  "smtpPort": zod.number().nullish(),
+  "smtpUsername": zod.string().nullish(),
+  "smtpPassword": zod.string().nullish(),
+  "smtpPasswordSet": zod.boolean().nullish(),
+  "smtpFromAddress": zod.string().nullish(),
+  "smsProvider": zod.string().nullish(),
+  "smsApiKey": zod.string().nullish(),
+  "smsApiKeySet": zod.boolean().nullish(),
+  "smsSenderId": zod.string().nullish(),
+  "whatsappProvider": zod.string().nullish(),
+  "whatsappApiKey": zod.string().nullish(),
+  "whatsappApiKeySet": zod.boolean().nullish(),
+  "aiProvider": zod.string().nullish(),
+  "aiApiKey": zod.string().nullish(),
+  "aiApiKeySet": zod.boolean().nullish(),
+  "aiModel": zod.string().nullish(),
+  "aiBaseUrl": zod.string().nullish(),
+  "analyticsId": zod.string().nullish(),
   "bannerHeight": zod.number().nullish(),
   "bannerSpeed": zod.number().nullish()
 })
@@ -96,6 +117,7 @@ export const GetAdminSettingsResponse = zod.object({
   "siteName": zod.string().nullish(),
   "tagline": zod.string().nullish(),
   "description": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
@@ -118,6 +140,26 @@ export const GetAdminSettingsResponse = zod.object({
   "chatbotEnabled": zod.boolean().nullish(),
   "chatbotName": zod.string().nullish(),
   "chatbotGreeting": zod.string().nullish(),
+  "chatbotModel": zod.string().nullish(),
+  "smtpHost": zod.string().nullish(),
+  "smtpPort": zod.number().nullish(),
+  "smtpUsername": zod.string().nullish(),
+  "smtpPassword": zod.string().nullish(),
+  "smtpPasswordSet": zod.boolean().nullish(),
+  "smtpFromAddress": zod.string().nullish(),
+  "smsProvider": zod.string().nullish(),
+  "smsApiKey": zod.string().nullish(),
+  "smsApiKeySet": zod.boolean().nullish(),
+  "smsSenderId": zod.string().nullish(),
+  "whatsappProvider": zod.string().nullish(),
+  "whatsappApiKey": zod.string().nullish(),
+  "whatsappApiKeySet": zod.boolean().nullish(),
+  "aiProvider": zod.string().nullish(),
+  "aiApiKey": zod.string().nullish(),
+  "aiApiKeySet": zod.boolean().nullish(),
+  "aiModel": zod.string().nullish(),
+  "aiBaseUrl": zod.string().nullish(),
+  "analyticsId": zod.string().nullish(),
   "bannerHeight": zod.number().nullish(),
   "bannerSpeed": zod.number().nullish()
 })
@@ -130,6 +172,7 @@ export const UpdateAdminSettingsBody = zod.object({
   "siteName": zod.string().nullish(),
   "tagline": zod.string().nullish(),
   "description": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
@@ -152,6 +195,26 @@ export const UpdateAdminSettingsBody = zod.object({
   "chatbotEnabled": zod.boolean().nullish(),
   "chatbotName": zod.string().nullish(),
   "chatbotGreeting": zod.string().nullish(),
+  "chatbotModel": zod.string().nullish(),
+  "smtpHost": zod.string().nullish(),
+  "smtpPort": zod.number().nullish(),
+  "smtpUsername": zod.string().nullish(),
+  "smtpPassword": zod.string().nullish(),
+  "smtpPasswordSet": zod.boolean().nullish(),
+  "smtpFromAddress": zod.string().nullish(),
+  "smsProvider": zod.string().nullish(),
+  "smsApiKey": zod.string().nullish(),
+  "smsApiKeySet": zod.boolean().nullish(),
+  "smsSenderId": zod.string().nullish(),
+  "whatsappProvider": zod.string().nullish(),
+  "whatsappApiKey": zod.string().nullish(),
+  "whatsappApiKeySet": zod.boolean().nullish(),
+  "aiProvider": zod.string().nullish(),
+  "aiApiKey": zod.string().nullish(),
+  "aiApiKeySet": zod.boolean().nullish(),
+  "aiModel": zod.string().nullish(),
+  "aiBaseUrl": zod.string().nullish(),
+  "analyticsId": zod.string().nullish(),
   "bannerHeight": zod.number().nullish(),
   "bannerSpeed": zod.number().nullish()
 })
@@ -160,6 +223,7 @@ export const UpdateAdminSettingsResponse = zod.object({
   "siteName": zod.string().nullish(),
   "tagline": zod.string().nullish(),
   "description": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "faviconUrl": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
@@ -182,8 +246,44 @@ export const UpdateAdminSettingsResponse = zod.object({
   "chatbotEnabled": zod.boolean().nullish(),
   "chatbotName": zod.string().nullish(),
   "chatbotGreeting": zod.string().nullish(),
+  "chatbotModel": zod.string().nullish(),
+  "smtpHost": zod.string().nullish(),
+  "smtpPort": zod.number().nullish(),
+  "smtpUsername": zod.string().nullish(),
+  "smtpPassword": zod.string().nullish(),
+  "smtpPasswordSet": zod.boolean().nullish(),
+  "smtpFromAddress": zod.string().nullish(),
+  "smsProvider": zod.string().nullish(),
+  "smsApiKey": zod.string().nullish(),
+  "smsApiKeySet": zod.boolean().nullish(),
+  "smsSenderId": zod.string().nullish(),
+  "whatsappProvider": zod.string().nullish(),
+  "whatsappApiKey": zod.string().nullish(),
+  "whatsappApiKeySet": zod.boolean().nullish(),
+  "aiProvider": zod.string().nullish(),
+  "aiApiKey": zod.string().nullish(),
+  "aiApiKeySet": zod.boolean().nullish(),
+  "aiModel": zod.string().nullish(),
+  "aiBaseUrl": zod.string().nullish(),
+  "analyticsId": zod.string().nullish(),
   "bannerHeight": zod.number().nullish(),
   "bannerSpeed": zod.number().nullish()
+})
+
+
+/**
+ * @summary Send a message to the configured public website chatbot
+ */
+export const sendChatbotMessageBodyMessageMax = 2000;
+
+
+
+export const SendChatbotMessageBody = zod.object({
+  "message": zod.string().min(1).max(sendChatbotMessageBodyMessageMax)
+})
+
+export const SendChatbotMessageResponse = zod.object({
+  "reply": zod.string()
 })
 
 

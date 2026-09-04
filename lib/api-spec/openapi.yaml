@@ -97,6 +97,20 @@ paths:
           content: { application/json: { schema: { $ref: "#/components/schemas/SiteSettings" } } }
         "400": { description: Invalid settings }
         "401": { description: Authentication required }
+  /chatbot/messages:
+    post:
+      operationId: sendChatbotMessage
+      tags: [settings]
+      summary: Send a message to the configured public website chatbot
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/ChatbotMessageInput" } } }
+      responses:
+        "200":
+          description: Chatbot reply
+          content: { application/json: { schema: { $ref: "#/components/schemas/ChatbotMessageResponse" } } }
+        "400": { description: Invalid message }
+        "503": { description: Chatbot unavailable }
   /admin/marketing/overview:
     get:
       operationId: getMarketingOverview
@@ -781,6 +795,7 @@ components:
         siteName: { type: ["string", "null"] }
         tagline: { type: ["string", "null"] }
         description: { type: ["string", "null"] }
+        siteUrl: { type: ["string", "null"] }
         logoUrl: { type: ["string", "null"] }
         faviconUrl: { type: ["string", "null"] }
         contactEmail: { type: ["string", "null"] }
@@ -803,11 +818,41 @@ components:
         chatbotEnabled: { type: ["boolean", "null"] }
         chatbotName: { type: ["string", "null"] }
         chatbotGreeting: { type: ["string", "null"] }
+        chatbotModel: { type: ["string", "null"] }
+        smtpHost: { type: ["string", "null"] }
+        smtpPort: { type: ["number", "null"] }
+        smtpUsername: { type: ["string", "null"] }
+        smtpPassword: { type: ["string", "null"] }
+        smtpPasswordSet: { type: ["boolean", "null"] }
+        smtpFromAddress: { type: ["string", "null"] }
+        smsProvider: { type: ["string", "null"] }
+        smsApiKey: { type: ["string", "null"] }
+        smsApiKeySet: { type: ["boolean", "null"] }
+        smsSenderId: { type: ["string", "null"] }
+        whatsappProvider: { type: ["string", "null"] }
+        whatsappApiKey: { type: ["string", "null"] }
+        whatsappApiKeySet: { type: ["boolean", "null"] }
+        aiProvider: { type: ["string", "null"] }
+        aiApiKey: { type: ["string", "null"] }
+        aiApiKeySet: { type: ["boolean", "null"] }
+        aiModel: { type: ["string", "null"] }
+        aiBaseUrl: { type: ["string", "null"] }
+        analyticsId: { type: ["string", "null"] }
         bannerHeight: { type: ["number", "null"] }
         bannerSpeed: { type: ["number", "null"] }
     SiteSettingsInput:
       allOf:
         - $ref: "#/components/schemas/SiteSettings"
+    ChatbotMessageInput:
+      type: object
+      properties:
+        message: { type: string, minLength: 1, maxLength: 2000 }
+      required: [message]
+    ChatbotMessageResponse:
+      type: object
+      properties:
+        reply: { type: string }
+      required: [reply]
     Campaign:
       type: object
       properties:

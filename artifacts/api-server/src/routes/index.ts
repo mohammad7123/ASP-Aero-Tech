@@ -7,6 +7,7 @@ import productsRouter from "./products";
 import storageRouter from "./storage";
 import settingsRouter from "./settings";
 import campaignsRouter from "./campaigns";
+import chatbotRouter from "./chatbot";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(productsRouter);
 router.use(storageRouter);
 router.use(settingsRouter);
 router.use(campaignsRouter);
+router.use(chatbotRouter);
 
 export default router;

@@ -38,6 +38,8 @@ export * from './campaignRecipient';
 export * from './campaignStats';
 export * from './campaignStatus';
 export * from './campaignType';
+export * from './chatbotMessageInput';
+export * from './chatbotMessageResponse';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './heroSlide';

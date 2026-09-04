@@ -37,6 +37,8 @@ import type {
   CampaignInput,
   CampaignPatch,
   CampaignPreparation,
+  ChatbotMessageInput,
+  ChatbotMessageResponse,
   ErrorResponse,
   HealthStatus,
   HeroSlide,
@@ -453,6 +455,77 @@ export const useUpdateAdminSettings = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getUpdateAdminSettingsMutationOptions(options));
+    }
+
+export const getSendChatbotMessageUrl = () => {
+
+
+
+
+  return `/api/chatbot/messages`
+}
+
+/**
+ * @summary Send a message to the configured public website chatbot
+ */
+export const sendChatbotMessage = async (chatbotMessageInput: ChatbotMessageInput, options?: Parameters<typeof customFetch>[1]): Promise<ChatbotMessageResponse> => {
+
+  return customFetch<ChatbotMessageResponse>(getSendChatbotMessageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(chatbotMessageInput)
+  }
+);}
+
+
+
+
+
+export const getSendChatbotMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendChatbotMessage>>, TError,{data: BodyType<ChatbotMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendChatbotMessage>>, TError,{data: BodyType<ChatbotMessageInput>}, TContext> => {
+
+const mutationKey = ['sendChatbotMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendChatbotMessage>>, {data: BodyType<ChatbotMessageInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendChatbotMessage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendChatbotMessageMutationResult = NonNullable<Awaited<ReturnType<typeof sendChatbotMessage>>>
+    export type SendChatbotMessageMutationBody = BodyType<ChatbotMessageInput>
+    export type SendChatbotMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Send a message to the configured public website chatbot
+ */
+export const useSendChatbotMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendChatbotMessage>>, TError,{data: BodyType<ChatbotMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendChatbotMessage>>,
+        TError,
+        {data: BodyType<ChatbotMessageInput>},
+        TContext
+      > => {
+      return useMutation(getSendChatbotMessageMutationOptions(options));
     }
 
 export const getGetMarketingOverviewUrl = () => {

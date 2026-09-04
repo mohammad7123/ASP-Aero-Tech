@@ -41,6 +41,7 @@ export function CookieConsent() {
 
   const savePreferences = (prefs: CookiePreferences) => {
     localStorage.setItem("asp_cookie_consent", JSON.stringify(prefs));
+    window.dispatchEvent(new Event("asp-cookie-consent-changed"));
     setPreferences(prefs);
     setShowBanner(false);
     setShowDialog(false);
