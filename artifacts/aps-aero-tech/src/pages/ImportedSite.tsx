@@ -239,7 +239,169 @@ function ProductCard({ icon: Icon, label, title, text, color, link = "/products"
 }
 
 function AboutPage() {
-  return <><PageHero eyebrow="About ASP Aero Tech" title={<>Indian engineering for <span style={{ color: primary }}>unmanned flight.</span></>} subtitle="ASP Aero Tech is a drone manufacturing company developing reliable, mission-configurable unmanned aerial systems for demanding defence and civil applications." image="https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=1200&q=85" /><section className="bg-white py-20"><div className="mx-auto grid max-w-[1440px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center"><div><SectionHeading eyebrow="Who we are" title="An engineering company with flight at its core." text="We unite aerostructures, propulsion, avionics, embedded systems, payload integration, autonomy, manufacturing, and field support. The result is a complete UAS program shaped around the operating environment—not a generic airframe looking for a mission." /><div className="grid grid-cols-2 gap-5 border-t border-gray-100 pt-7 sm:grid-cols-4">{[["UAS", "Focused engineering"], ["360°", "System integration"], ["India", "Design & manufacture"], ["1", "Lifecycle partner"]].map(([number, label]) => <div key={label}><strong className="block text-2xl font-black" style={{ color: orange }}>{number}</strong><span className="mt-1 block text-xs font-bold uppercase tracking-wide text-gray-500">{label}</span></div>)}</div></div><div className="relative"><div className="absolute -bottom-5 -left-5 h-36 w-36 rounded-2xl" style={{ backgroundColor: `${primary}22` }} /><img src="https://images.unsplash.com/photo-1506947411487-a56738267384?auto=format&fit=crop&w=1000&q=85" alt="Drone engineering and field operations" className="relative h-[390px] w-full rounded-2xl object-cover shadow-xl" /></div></div></section><section className="bg-[#FAFAF8] py-20"><div className="mx-auto max-w-[1440px] px-5 sm:px-8"><SectionHeading eyebrow="What drives us" title="Designed for the conditions that matter." /><div className="grid gap-5 md:grid-cols-3">{[[Target, "Mission first", "Range, endurance, payload, communications, terrain, and operator workflow define every system decision."], [ShieldCheck, "Reliability by design", "We engineer for predictable flight behaviour, maintainability, redundancy, and disciplined validation."], [Award, "Indigenous capability", "Local engineering and manufacturing strengthen supply resilience, customization, and lifecycle control."]].map(([Icon, title, text]) => <div key={title as string} className="rounded-2xl border border-gray-100 bg-white p-7"><div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-orange-50" style={{ color: orange }}><Icon size={20} /></div><h3 className="text-lg font-bold text-[#0B203D]">{title as string}</h3><p className="mt-2 text-sm leading-relaxed text-gray-500">{text as string}</p></div>)}</div></div></section><section className="bg-white py-20"><div className="mx-auto max-w-3xl px-5 text-center sm:px-8"><Quote className="mx-auto mb-5" size={30} style={{ color: primary }} /><p className="text-2xl font-bold leading-relaxed text-[#0B203D] sm:text-3xl">“Mission readiness begins long before take-off—with disciplined engineering, testing, manufacturing, and operator preparation.”</p><p className="mt-5 text-sm font-bold uppercase tracking-widest text-gray-500">ASP Aero Tech</p></div></section></>;
+  return (
+    <>
+      <PageHero
+        eyebrow="About ASP Aero Tech"
+        title={
+          <>Engineering the Future of <br className="hidden sm:block" />
+          <span style={{ color: primary }}>Indian Aerospace.</span></>
+        }
+        subtitle="An Indian technology and manufacturing company focused on the development of unmanned aerial systems, aerospace electronics, embedded systems, and mission-oriented solutions."
+        image="/product-images/fixed-wing.jpg"
+      />
+
+      <section className="bg-white py-20 lg:py-32">
+        <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <SectionHeading
+              eyebrow="Technology & Mission"
+              title="Where technology meets the mission."
+              text="Modern aerospace and defence systems are no longer built around hardware alone. They require the integration of Software, Electronics, Aerospace Engineering, AI, Communication, and Mission Intelligence. ASP Aero Tech brings these capabilities together under one technology ecosystem."
+            />
+            <div className="mt-8 grid grid-cols-2 gap-6 border-t border-gray-100 pt-8 sm:grid-cols-3">
+              {[
+                ["Performance", "Engineered for extremes"],
+                ["Reliability", "Mission-critical focus"],
+                ["Indigenous", "Built for India"]
+              ].map(([title, label]) => (
+                <div key={title}>
+                  <strong className="block text-xl font-black text-[#0B203D]">{title}</strong>
+                  <span className="mt-1 block text-xs font-bold uppercase tracking-wide text-gray-500">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute -bottom-6 -left-6 h-48 w-48 rounded-2xl" style={{ backgroundColor: `${primary}22` }} />
+            <div className="absolute -top-6 -right-6 h-48 w-48 rounded-2xl" style={{ backgroundColor: `${green}22` }} />
+            <img src="/product-images/surveillance.jpg" alt="Surveillance Drone" className="relative h-[420px] w-full rounded-2xl object-cover shadow-2xl" />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#FAFAF8] py-20 lg:py-32">
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
+          <SectionHeading
+            eyebrow="Our Foundation"
+            title="The pillars of our capability."
+            text="ASP Aero Tech combines digital capabilities, operational field experience, and deep technical engineering to develop systems that are deployable and mission-ready."
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              [Code2, "Software-Driven Technology", "We approach drone systems as integrated digital platforms. From embedded flight-control to AI automation and secure command systems, our software-first approach allows hardware to become smarter, more connected, and highly adaptable."],
+              [ShieldCheck, "Defence Experience", "Guided by an Advisory Board of senior defence professionals. Their understanding of operational environments, field challenges, and mission realities ensures we build what a mission actually requires, not just what technology can do."],
+              [Lightbulb, "IIT Alumni & Engineering", "Supported by IIT alumni and experienced engineering professionals across aerospace, electronics, embedded systems, and robotics. We combine academic excellence with practical industry experience to convert complex challenges into deployable solutions."]
+            ].map(([Icon, title, text]) => (
+              <div key={title as string} className="group rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-50 transition-colors group-hover:bg-[#F47E20]" style={{ color: orange }}>
+                  <Icon size={26} className="transition-colors group-hover:text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0B203D]">{title as string}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-gray-600">{text as string}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 lg:py-32">
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
+          <SectionHeading
+            eyebrow="What We Build"
+            title="A comprehensive aerospace ecosystem."
+            text="ASP Aero Tech is developing capabilities across the broader Drone, Aerospace & Electronics ecosystem to provide integrated solutions designed around specific operational requirements."
+          />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              [Rocket, "Unmanned Aerial Systems", "Advanced drone platforms designed for surveillance, inspection, mapping, logistics, and specialized tactical missions.", orange],
+              [Network, "Aerospace Electronics", "Electronic systems, control electronics, communication modules, sensors, and mission-oriented aerospace subsystems.", green],
+              [Workflow, "Embedded & Intelligent Systems", "Hardware-software systems combining embedded computing, automation, artificial intelligence, sensors, and real-time data processing.", navy],
+              [Target, "Command & Control", "Technology platforms and ground-control stations for monitoring, managing, communicating with, and operating unmanned aerial systems.", "#167C80"],
+              [Award, "Mission Technologies", "Integrated solutions configured for specific field operations and outcomes, avoiding generic one-size-fits-all hardware constraints.", "#7455B8"]
+            ].map(([Icon, title, text, color]) => (
+              <div key={title as string} className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${color as string}15`, color: color as string }}>
+                  <Icon size={22} />
+                </div>
+                <h3 className="text-lg font-bold text-[#0B203D]">{title as string}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-gray-500">{text as string}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#0B203D] py-20 lg:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "linear-gradient(120deg, transparent 0%, rgba(212,146,12,.5) 100%)" }} />
+        <div className="relative mx-auto max-w-[1440px] px-5 sm:px-8">
+          <div className="mb-16">
+            <span className="mb-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em]" style={{ color: primary }}><span className="h-0.5 w-6" style={{ backgroundColor: primary }} /> Our Approach</span>
+            <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl">Design. Engineer. Integrate. Deploy.</h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/70">We believe successful aerospace technology comes from the tight integration of multiple disciplines.</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["01", "Understand", "We begin by understanding the operational requirement, environment, constraints, and specific mission objectives."],
+              ["02", "Design", "Our multidisciplinary teams develop the architecture, electronics, software, and mechanical systems required."],
+              ["03", "Engineer", "We transform concepts into engineered prototypes through structured, iterative development, testing, and refinement."],
+              ["04", "Integrate", "Hardware, software, communication, sensors, and mission systems are combined into a single unified platform."],
+              ["05", "Validate", "Systems are rigorously evaluated against defined performance, reliability, and operational requirements."],
+              ["06", "Deploy", "Delivering practical, scalable technology capable of moving out of the laboratory and into real-world applications."]
+            ].map(([num, title, text]) => (
+              <div key={title} className="relative rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all hover:bg-white/[0.06]">
+                <span className="absolute -top-5 right-6 text-6xl font-black opacity-10" style={{ color: primary }}>{num}</span>
+                <h3 className="text-xl font-bold text-white"><span style={{ color: primary }} className="mr-2">{num} —</span>{title}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-white/60">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 lg:py-32">
+        <div className="mx-auto grid max-w-[1440px] gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
+          <div className="order-2 lg:order-1 relative">
+            <div className="absolute -bottom-4 -right-4 h-full w-full rounded-2xl" style={{ backgroundColor: `${green}15` }} />
+            <img src="/product-images/vtol.jpg" alt="VTOL Drone Platform" className="relative h-[500px] w-full rounded-2xl object-cover shadow-xl" />
+          </div>
+          <div className="order-1 lg:order-2">
+            <SectionHeading
+              eyebrow="India's Future"
+              title="Built in India. Designed for the Future."
+              text="ASP Aero Tech is committed to contributing to India's growing indigenous aerospace, drone, electronics, and defence technology ecosystem."
+            />
+            <p className="mt-4 text-base leading-relaxed text-gray-600">We believe India has the engineering talent, scientific capability, manufacturing potential, and entrepreneurial energy required to become a global technology leader.</p>
+            <div className="mt-8 rounded-2xl border-l-4 bg-gray-50 p-6 sm:p-8" style={{ borderColor: orange }}>
+              <Quote size={28} className="mb-4 opacity-50" style={{ color: orange }} />
+              <p className="text-lg font-bold italic leading-relaxed text-[#0B203D]">
+                "Our role is to contribute by building Indian intellectual property, Indian engineering capabilities, and Indian technology products. From concept to capability—we are building technology for India's next generation of aerospace and defence systems."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#FAFAF8] py-20 lg:py-32">
+        <div className="mx-auto max-w-[1000px] px-5 text-center sm:px-8">
+          <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: `${primary}15`, color: primary }}>
+            <Award size={32} />
+          </div>
+          <h2 className="text-3xl font-black text-[#0B203D] sm:text-4xl lg:text-5xl">Engineering the Future.</h2>
+          <p className="mt-6 text-lg leading-relaxed text-gray-600 sm:text-xl">To develop reliable, intelligent, and indigenous technology platforms that solve complex real-world problems across aerospace, defence, security, industrial, and commercial applications.</p>
+
+          <div className="mt-12 flex flex-wrap justify-center gap-3">
+            {["Innovation", "Engineering Excellence", "Indigenization", "Reliability", "Security", "Mission Focus"].map((tag) => (
+              <span key={tag} className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#0B203D] shadow-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
 
 function ServicesPage() {
