@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { ContactAddress } from './contactAddress';
 
 export interface SiteSettings {
   /** @nullable */
@@ -27,6 +28,8 @@ export interface SiteSettings {
   contactPhone2?: string | null;
   /** @nullable */
   address?: string | null;
+  /** @nullable */
+  addresses?: ContactAddress[] | null;
   /** @nullable */
   whatsappNumber?: string | null;
   /** @nullable */

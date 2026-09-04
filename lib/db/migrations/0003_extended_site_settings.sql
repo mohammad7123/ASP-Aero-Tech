@@ -1,6 +1,7 @@
 -- Extended protected configuration for ASP Aero Tech.
 ALTER TABLE site_settings
   ADD COLUMN IF NOT EXISTS site_url TEXT,
+  ADD COLUMN IF NOT EXISTS addresses JSONB NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS chatbot_model TEXT,
   ADD COLUMN IF NOT EXISTS smtp_host TEXT,
   ADD COLUMN IF NOT EXISTS smtp_port INTEGER,

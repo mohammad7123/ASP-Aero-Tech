@@ -40,6 +40,7 @@ export * from './campaignStatus';
 export * from './campaignType';
 export * from './chatbotMessageInput';
 export * from './chatbotMessageResponse';
+export * from './contactAddress';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './heroSlide';

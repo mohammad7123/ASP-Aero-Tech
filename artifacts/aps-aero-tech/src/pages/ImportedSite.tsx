@@ -331,7 +331,7 @@ function LegacyFooter({ settings }: { settings: any }) {
   const siteName = settings?.siteName || "ASP Aero Tech";
   const logoUrl = settings?.logoUrl || "/asp-logo.png";
   const description = settings?.description || "We design and manufacture mission-ready unmanned aerial systems for defence, industry, public safety, and critical infrastructure.";
-  const address = settings?.address || "India";
+  const address = settings?.addresses?.[0]?.address || settings?.address || "India";
 
   return (
     <footer className="border-t border-gray-100 bg-[#FAFAF8]">
@@ -648,8 +648,12 @@ function IndustriesPage() {
 
 function ContactPage() {
   const createInquiry = useCreateInquiry();
+  const { data: settings } = useGetPublicSettings();
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const addresses = settings?.addresses?.length
+    ? settings.addresses
+    : [{ label: "ASP Aero Tech", address: settings?.address || "India", phone: settings?.contactPhone || "", email: settings?.contactEmail || "" }];
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -665,7 +669,52 @@ function ContactPage() {
     setError("");
     createInquiry.mutate({ data }, { onSuccess: () => { setSent(true); event.currentTarget.reset(); }, onError: () => setError("We could not send your message. Please try again.") });
   };
-  return <><PageHero eyebrow="Request a technical briefing" title={<>Tell us about the <span style={{ color: primary }}>mission.</span></>} subtitle="Share the operating environment, range, endurance, payload, communications, and deployment objectives. Our engineering team will review the requirement." /><section className="bg-white py-16 lg:py-20"><div className="mx-auto grid max-w-[1100px] gap-10 px-5 sm:px-8 lg:grid-cols-[.75fr_1.25fr]"><div><SectionHeading eyebrow="Engage ASP Aero Tech" title="Start with the operating requirement." text="Contact us for product information, a technical briefing, platform configuration, integration support, training, or a demonstration discussion." /><div className="space-y-4 text-sm text-gray-600"><span className="flex items-center gap-3"><MessageSquare size={18} style={{ color: primary }} /> Technical and mission enquiries</span><span className="flex items-center gap-3"><Headphones size={18} style={{ color: primary }} /> Training and lifecycle support</span><span className="flex items-center gap-3"><MapPin size={18} style={{ color: primary }} /> India</span></div></div><div className="rounded-2xl border border-gray-100 bg-[#FAFAF8] p-6 sm:p-8">{sent ? <div className="flex min-h-[340px] flex-col items-center justify-center text-center"><div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check size={24} /></div><h2 className="mt-4 text-2xl font-black text-[#0B203D]">Requirement received.</h2><p className="mt-2 max-w-sm text-sm leading-relaxed text-gray-500">Thank you. An ASP Aero Tech representative will review your enquiry and respond shortly.</p><button className="mt-5 text-sm font-bold" style={{ color: orange }} onClick={() => setSent(false)}>Send another enquiry</button></div> : <form onSubmit={submit} className="space-y-4"><div className="grid gap-4 sm:grid-cols-2"><Field label="Full name" name="name" required /><Field label="Email address" name="email" type="email" required /></div><div className="grid gap-4 sm:grid-cols-2"><Field label="Phone number" name="phone" type="tel" required pattern="[+]?[0-9(). -]{7,25}" title="Enter a valid phone number, including country code when applicable" /><Field label="Organization" name="organization" /></div><div className="grid gap-4 sm:grid-cols-1"><label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-500">Area of interest</span><select name="interest" required className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-[#F47E20]"><option value="">Select one</option><option value="defence-isr">Defence & ISR</option><option value="industrial-inspection">Industrial inspection</option><option value="survey-mapping">Surveying & mapping</option><option value="emergency-response">Emergency response</option><option value="payload-integration">Payload integration</option><option value="training-support">Training & support</option><option value="other">Other requirement</option></select></label></div><label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-500">Mission requirement</span><textarea name="message" required minLength={10} rows={5} className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-[#F47E20]" placeholder="Operating environment, payload, range, endurance, deployment schedule, or other requirements..." /></label><div className="flex items-start gap-3"><input type="checkbox" id="marketingConsent" name="marketingConsent" defaultChecked className="mt-1 accent-[#F47E20]" /><label htmlFor="marketingConsent" className="text-xs text-gray-500">I agree to receive marketing communications from ASP Aero Tech by email, phone, SMS, or WhatsApp. I can unsubscribe at any time.</label></div>{error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}<button disabled={createInquiry.isPending} className="inline-flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold text-white disabled:opacity-60" style={{ backgroundColor: orange }}>{createInquiry.isPending ? "Sending..." : "Submit requirement"} <ArrowRight size={15} /></button></form>}</div></div></section></>;
+  return (
+    <>
+      <PageHero eyebrow="Request a technical briefing" title={<>Tell us about the <span style={{ color: primary }}>mission.</span></>} subtitle="Share the operating environment, range, endurance, payload, communications, and deployment objectives. Our engineering team will review the requirement." />
+      <section className="bg-white py-16 lg:py-20">
+        <div className="mx-auto grid max-w-[1100px] gap-10 px-5 sm:px-8 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <SectionHeading eyebrow="Engage ASP Aero Tech" title="Start with the operating requirement." text="Contact us for product information, a technical briefing, platform configuration, integration support, training, or a demonstration discussion." />
+            <div className="space-y-4 text-sm text-gray-600">
+              <span className="flex items-center gap-3"><MessageSquare size={18} style={{ color: primary }} /> Technical and mission enquiries</span>
+              <span className="flex items-center gap-3"><Headphones size={18} style={{ color: primary }} /> Training and lifecycle support</span>
+            </div>
+            <div className="mt-8 space-y-4">
+              {addresses.map((location, index) => (
+                <article key={`${location.label}-${index}`} className="rounded-xl border border-gray-100 bg-[#FAFAF8] p-5">
+                  <h3 className="font-bold text-[#0B203D]">{location.label || `Location ${index + 1}`}</h3>
+                  <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-gray-600"><MapPin size={16} className="mt-0.5 shrink-0" style={{ color: primary }} /> {location.address}</p>
+                  {location.phone && <a href={`tel:${location.phone}`} className="mt-2 flex items-center gap-2 text-sm text-gray-600 hover:text-[#F47E20]"><Phone size={15} style={{ color: primary }} /> {location.phone}</a>}
+                  {location.email && <a href={`mailto:${location.email}`} className="mt-2 flex items-center gap-2 text-sm text-gray-600 hover:text-[#F47E20]"><Mail size={15} style={{ color: primary }} /> {location.email}</a>}
+                </article>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-[#FAFAF8] p-6 sm:p-8">
+            {sent ? (
+              <div className="flex min-h-[340px] flex-col items-center justify-center text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><Check size={24} /></div>
+                <h2 className="mt-4 text-2xl font-black text-[#0B203D]">Requirement received.</h2>
+                <p className="mt-2 max-w-sm text-sm leading-relaxed text-gray-500">Thank you. An ASP Aero Tech representative will review your enquiry and respond shortly.</p>
+                <button className="mt-5 text-sm font-bold" style={{ color: orange }} onClick={() => setSent(false)}>Send another enquiry</button>
+              </div>
+            ) : (
+              <form onSubmit={submit} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2"><Field label="Full name" name="name" required /><Field label="Email address" name="email" type="email" required /></div>
+                <div className="grid gap-4 sm:grid-cols-2"><Field label="Phone number" name="phone" type="tel" required pattern="[+]?[0-9(). -]{7,25}" title="Enter a valid phone number, including country code when applicable" /><Field label="Organization" name="organization" /></div>
+                <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-500">Area of interest</span><select name="interest" required className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-[#F47E20]"><option value="">Select one</option><option value="defence-isr">Defence & ISR</option><option value="industrial-inspection">Industrial inspection</option><option value="survey-mapping">Surveying & mapping</option><option value="emergency-response">Emergency response</option><option value="payload-integration">Payload integration</option><option value="training-support">Training & support</option><option value="other">Other requirement</option></select></label>
+                <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-wider text-gray-500">Mission requirement</span><textarea name="message" required minLength={10} rows={5} className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-[#F47E20]" placeholder="Operating environment, payload, range, endurance, deployment schedule, or other requirements..." /></label>
+                <div className="flex items-start gap-3"><input type="checkbox" id="marketingConsent" name="marketingConsent" defaultChecked className="mt-1 accent-[#F47E20]" /><label htmlFor="marketingConsent" className="text-xs text-gray-500">I agree to receive marketing communications from ASP Aero Tech by email, phone, SMS, or WhatsApp. I can unsubscribe at any time.</label></div>
+                {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+                <button disabled={createInquiry.isPending} className="inline-flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold text-white disabled:opacity-60" style={{ backgroundColor: orange }}>{createInquiry.isPending ? "Sending..." : "Submit requirement"} <ArrowRight size={15} /></button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
 
 function Field({ label, name, type = "text", required = false, pattern, title }: { label: string; name: string; type?: string; required?: boolean; pattern?: string; title?: string }) {

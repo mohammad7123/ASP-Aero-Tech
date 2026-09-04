@@ -69,6 +69,12 @@ export const GetPublicSettingsResponse = zod.object({
   "contactPhone": zod.string().nullish(),
   "contactPhone2": zod.string().nullish(),
   "address": zod.string().nullish(),
+  "addresses": zod.array(zod.object({
+  "label": zod.string(),
+  "address": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})).nullish(),
   "whatsappNumber": zod.string().nullish(),
   "whatsappGreeting": zod.string().nullish(),
   "linkedinUrl": zod.string().nullish(),
@@ -124,6 +130,12 @@ export const GetAdminSettingsResponse = zod.object({
   "contactPhone": zod.string().nullish(),
   "contactPhone2": zod.string().nullish(),
   "address": zod.string().nullish(),
+  "addresses": zod.array(zod.object({
+  "label": zod.string(),
+  "address": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})).nullish(),
   "whatsappNumber": zod.string().nullish(),
   "whatsappGreeting": zod.string().nullish(),
   "linkedinUrl": zod.string().nullish(),
@@ -179,6 +191,12 @@ export const UpdateAdminSettingsBody = zod.object({
   "contactPhone": zod.string().nullish(),
   "contactPhone2": zod.string().nullish(),
   "address": zod.string().nullish(),
+  "addresses": zod.array(zod.object({
+  "label": zod.string(),
+  "address": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})).nullish(),
   "whatsappNumber": zod.string().nullish(),
   "whatsappGreeting": zod.string().nullish(),
   "linkedinUrl": zod.string().nullish(),
@@ -230,6 +248,12 @@ export const UpdateAdminSettingsResponse = zod.object({
   "contactPhone": zod.string().nullish(),
   "contactPhone2": zod.string().nullish(),
   "address": zod.string().nullish(),
+  "addresses": zod.array(zod.object({
+  "label": zod.string(),
+  "address": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})).nullish(),
   "whatsappNumber": zod.string().nullish(),
   "whatsappGreeting": zod.string().nullish(),
   "linkedinUrl": zod.string().nullish(),

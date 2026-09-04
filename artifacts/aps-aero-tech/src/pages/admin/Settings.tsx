@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useForm, type UseFormRegisterReturn } from "react-hook-form";
+import { useFieldArray, useForm, type UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@workspace/api-client-react";
 import {
   AlertCircle, BarChart3, Bot, BrainCircuit, Download, FileCode2, Globe, Loader2, Mail,
-  MessageCircle, Palette, Phone, Save, Share2, Smartphone,
+  MessageCircle, Palette, Phone, Plus, Save, Share2, Smartphone, Trash2,
 } from "lucide-react";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
@@ -17,18 +17,23 @@ import { useToast } from "@/hooks/use-toast";
 const nullableText = z.string().nullable().optional();
 const nullableUrl = z.string().url("Enter a valid URL").or(z.literal("")).nullable().optional();
 const color = z.string().regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, "Enter a valid hex color").or(z.literal("")).nullable().optional();
+const optionalNumber = (minimum: number, maximum: number) => z.preprocess(
+  (value) => value === "" || value === null || value === undefined ? null : Number(value),
+  z.number().min(minimum).max(maximum).nullable(),
+).optional();
 
 const schema = z.object({
   siteName: nullableText, tagline: nullableText, description: nullableText, siteUrl: nullableUrl, logoUrl: nullableUrl, faviconUrl: nullableUrl,
   contactEmail: z.string().email("Enter a valid email").or(z.literal("")).nullable().optional(),
   contactPhone: nullableText, contactPhone2: nullableText, address: nullableText,
+  addresses: z.array(z.object({ label: z.string(), address: z.string(), phone: z.string(), email: z.string() })).nullable().optional(),
   whatsappNumber: nullableText, whatsappGreeting: nullableText,
   linkedinUrl: nullableUrl, twitterUrl: nullableUrl, facebookUrl: nullableUrl, instagramUrl: nullableUrl, youtubeUrl: nullableUrl,
   primaryColor: color, secondaryColor: color, accentColor: color, backgroundColor: color,
   theme: nullableText, fontFamily: nullableText,
-  bannerHeight: z.coerce.number().min(300).max(1000).nullable().optional(),
-  bannerSpeed: z.coerce.number().min(1).max(60).nullable().optional(),
-  smtpHost: nullableText, smtpPort: z.coerce.number().min(1).max(65535).nullable().optional(),
+  bannerHeight: optionalNumber(300, 1000),
+  bannerSpeed: optionalNumber(1000, 60000),
+  smtpHost: nullableText, smtpPort: optionalNumber(1, 65535),
   smtpUsername: nullableText, smtpPassword: nullableText, smtpPasswordSet: z.boolean().nullable().optional(), smtpFromAddress: nullableText,
   smsProvider: nullableText, smsApiKey: nullableText, smsApiKeySet: z.boolean().nullable().optional(), smsSenderId: nullableText,
   whatsappProvider: nullableText, whatsappApiKey: nullableText, whatsappApiKeySet: z.boolean().nullable().optional(),
@@ -88,11 +93,17 @@ export function AdminSettings() {
   const update = useUpdateAdminSettings();
   const [tab, setTab] = useState<Tab>("general");
   const initialized = useRef(false);
-  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { chatbotEnabled: false } });
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { chatbotEnabled: false, addresses: [] } });
+  const locations = useFieldArray({ control: form.control, name: "addresses" });
 
   useEffect(() => {
     if (data && !initialized.current) {
-      form.reset({ ...data, chatbotEnabled: data.chatbotEnabled ?? false });
+      const legacyAddress = data.address?.trim();
+      form.reset({
+        ...data,
+        chatbotEnabled: data.chatbotEnabled ?? false,
+        addresses: data.addresses?.length ? data.addresses : legacyAddress ? [{ label: "Head Office", address: legacyAddress, phone: "", email: "" }] : [],
+      });
       initialized.current = true;
     }
   }, [data, form]);
@@ -110,6 +121,12 @@ export function AdminSettings() {
         variant: "destructive",
       }),
     });
+  };
+
+  const invalid = (formErrors: typeof form.formState.errors) => {
+    const first = Object.values(formErrors)[0];
+    const message = first && "message" in first && typeof first.message === "string" ? first.message : "Review the highlighted fields in each settings section.";
+    toast({ title: "Please correct the settings", description: message, variant: "destructive" });
   };
 
   const tabs: Array<{ id: Tab; label: string; icon: typeof Globe }> = [
@@ -155,7 +172,7 @@ export function AdminSettings() {
           <h1 className="font-display text-3xl font-bold tracking-tight">System Settings</h1>
           <p className="mt-1 text-muted-foreground">Configure public presentation, communication providers, analytics, and AI.</p>
         </div>
-        <button onClick={form.handleSubmit(save)} disabled={update.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-bold uppercase tracking-wider text-primary-foreground transition-opacity disabled:opacity-50">
+        <button onClick={form.handleSubmit(save, invalid)} disabled={update.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-bold uppercase tracking-wider text-primary-foreground transition-opacity disabled:opacity-50">
           {update.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save Settings
         </button>
       </div>
@@ -169,7 +186,7 @@ export function AdminSettings() {
           ))}
         </nav>
 
-        <form onSubmit={form.handleSubmit(save)} className="min-h-[520px] rounded border border-border bg-card p-6 sm:p-8">
+        <form onSubmit={form.handleSubmit(save, invalid)} className="min-h-[520px] rounded border border-border bg-card p-6 sm:p-8">
           {tab === "general" && <Section title="General" description="Brand identity and website assets.">
             <div className="grid gap-6 sm:grid-cols-2">
               <Field label="Site Name" registration={form.register("siteName")} />
@@ -187,7 +204,7 @@ export function AdminSettings() {
               <div className="space-y-2"><label className="text-xs font-mono uppercase text-muted-foreground">Theme</label><select {...form.register("theme")} className={inputClass}><option value="">Default</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
               <Field label="Font Family" registration={form.register("fontFamily")} placeholder="Inter, sans-serif" />
               <Field label="Banner Height (px)" registration={form.register("bannerHeight")} type="number" error={errors.bannerHeight?.message} />
-              <Field label="Carousel Speed (seconds)" registration={form.register("bannerSpeed")} type="number" error={errors.bannerSpeed?.message} />
+              <Field label="Carousel Speed (milliseconds)" registration={form.register("bannerSpeed")} type="number" help="Example: 5000 equals five seconds." error={errors.bannerSpeed?.message} />
             </div>
           </Section>}
 
@@ -197,7 +214,26 @@ export function AdminSettings() {
               <Field label="Primary Phone" registration={form.register("contactPhone")} />
               <Field label="Secondary Phone" registration={form.register("contactPhone2")} />
             </div>
-            <div className="space-y-2"><label className="text-xs font-mono uppercase text-muted-foreground">Address</label><textarea {...form.register("address")} rows={3} className={inputClass} /></div>
+            <div className="border-t border-border pt-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div><h3 className="text-sm font-bold">Office & Facility Addresses</h3><p className="text-xs text-muted-foreground">Every location appears on the Contact page.</p></div>
+                <button type="button" onClick={() => locations.append({ label: "", address: "", phone: "", email: "" })} className="flex items-center gap-2 rounded border border-primary px-3 py-2 text-xs font-bold text-primary hover:bg-primary/5"><Plus className="h-4 w-4" /> Add Address</button>
+              </div>
+              <div className="space-y-4">
+                {locations.fields.length === 0 && <p className="rounded border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No locations added yet.</p>}
+                {locations.fields.map((location, index) => (
+                  <div key={location.id} className="rounded border border-border bg-background/50 p-4">
+                    <div className="mb-4 flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Location {index + 1}</span><button type="button" onClick={() => locations.remove(index)} className="rounded p-2 text-red-500 hover:bg-red-500/10" aria-label={`Remove location ${index + 1}`}><Trash2 className="h-4 w-4" /></button></div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field label="Location Name" registration={form.register(`addresses.${index}.label`)} placeholder="Head Office" />
+                      <Field label="Phone" registration={form.register(`addresses.${index}.phone`)} />
+                      <div className="sm:col-span-2"><Field label="Full Address" registration={form.register(`addresses.${index}.address`)} placeholder="Street, city, state, postal code, country" /></div>
+                      <Field label="Email" registration={form.register(`addresses.${index}.email`)} type="email" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </Section>}
 
           {tab === "social" && <Section title="Social Media" description="Public profile links used in the website footer.">

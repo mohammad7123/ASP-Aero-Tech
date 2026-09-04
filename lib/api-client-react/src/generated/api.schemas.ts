@@ -127,6 +127,13 @@ export interface UploadUrlResponse {
   metadata: UploadUrlRequest;
 }
 
+export interface ContactAddress {
+  label: string;
+  address: string;
+  phone: string;
+  email: string;
+}
+
 export interface SiteSettings {
   /** @nullable */
   siteName?: string | null;
@@ -148,6 +155,8 @@ export interface SiteSettings {
   contactPhone2?: string | null;
   /** @nullable */
   address?: string | null;
+  /** @nullable */
+  addresses?: ContactAddress[] | null;
   /** @nullable */
   whatsappNumber?: string | null;
   /** @nullable */

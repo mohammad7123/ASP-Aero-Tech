@@ -802,6 +802,9 @@ components:
         contactPhone: { type: ["string", "null"] }
         contactPhone2: { type: ["string", "null"] }
         address: { type: ["string", "null"] }
+        addresses:
+          type: ["array", "null"]
+          items: { $ref: "#/components/schemas/ContactAddress" }
         whatsappNumber: { type: ["string", "null"] }
         whatsappGreeting: { type: ["string", "null"] }
         linkedinUrl: { type: ["string", "null"] }
@@ -843,6 +846,14 @@ components:
     SiteSettingsInput:
       allOf:
         - $ref: "#/components/schemas/SiteSettings"
+    ContactAddress:
+      type: object
+      properties:
+        label: { type: string }
+        address: { type: string }
+        phone: { type: string }
+        email: { type: string }
+      required: [label, address, phone, email]
     ChatbotMessageInput:
       type: object
       properties:

@@ -5,6 +5,7 @@ export const siteSettingsTable = pgTable("site_settings", {
   siteName: text("site_name").notNull().default("ASP Aero Tech"),
   tagline: text("tagline"), description: text("description"), siteUrl: text("site_url"), logoUrl: text("logo_url"), faviconUrl: text("favicon_url"),
   contactEmail: text("contact_email"), contactPhone: text("contact_phone"), contactPhone2: text("contact_phone2"), address: text("address"),
+  addresses: jsonb("addresses").notNull().default([]),
   whatsappNumber: text("whatsapp_number"), whatsappGreeting: text("whatsapp_greeting"),
   linkedinUrl: text("linkedin_url"), twitterUrl: text("twitter_url"), facebookUrl: text("facebook_url"), instagramUrl: text("instagram_url"), youtubeUrl: text("youtube_url"),
   primaryColor: text("primary_color"), secondaryColor: text("secondary_color"), accentColor: text("accent_color"), theme: text("theme"), backgroundColor: text("background_color"), fontFamily: text("font_family"),

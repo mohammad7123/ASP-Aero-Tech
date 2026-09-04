@@ -7,7 +7,7 @@ const router: IRouter = Router();
 
 const publicFields = [
   "site_name", "tagline", "description", "site_url", "logo_url", "favicon_url",
-  "contact_email", "contact_phone", "contact_phone2", "address", "whatsapp_number", "whatsapp_greeting",
+  "contact_email", "contact_phone", "contact_phone2", "address", "addresses", "whatsapp_number", "whatsapp_greeting",
   "linkedin_url", "twitter_url", "facebook_url", "instagram_url", "youtube_url",
   "primary_color", "secondary_color", "accent_color", "theme", "background_color", "font_family",
   "chatbot_enabled", "chatbot_name", "chatbot_greeting", "banner_height", "banner_speed", "analytics_id",
@@ -22,6 +22,7 @@ const protectedFields = [
 const fields = [...publicFields, ...protectedFields] as const;
 const numeric = new Set(["banner_height", "banner_speed", "smtp_port"]);
 const boolean = new Set(["chatbot_enabled"]);
+const json = new Set(["addresses"]);
 const camel = (name: string) => name.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
 const secretFields = {
   smtpPassword: "smtp_password_encrypted",
@@ -113,7 +114,7 @@ router.put("/admin/settings", async (req, res): Promise<void> => {
       if (numeric.has(field) && (!Number.isFinite(Number(value)) || Number(value) < 0)) {
         res.status(400).json({ error: `${key} must be a non-negative number` }); return;
       }
-      values.push([field, boolean.has(field) ? value === true : numeric.has(field) ? Number(value) : value === "" ? null : value]);
+      values.push([field, boolean.has(field) ? value === true : numeric.has(field) ? Number(value) : json.has(field) ? JSON.stringify(value) : value === "" ? null : value]);
     }
     for (const [key, field] of Object.entries(secretFields)) {
       if (!columns.has(field) || req.body?.[key] === undefined) continue;
