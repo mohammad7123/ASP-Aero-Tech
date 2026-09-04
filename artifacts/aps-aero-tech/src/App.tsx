@@ -37,6 +37,7 @@ function Router() {
         <Route path="/blog" component={ImportedSite} />
         <Route path="/blog/:slug" component={ImportedSite} />
         <Route path="/contact" component={ImportedSite} />
+        <Route path="/privacy-policy" component={ImportedSite} />
         <Route path="/" component={ImportedSite} />
         <Route component={NotFound} />
       </Switch>

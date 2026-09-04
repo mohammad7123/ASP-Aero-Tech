@@ -28,15 +28,15 @@ export function ProductsPage() {
     <>
       <section className="relative overflow-hidden bg-[#0B203D]">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(120deg, transparent 0%, rgba(212,146,12,.45) 100%)" }} />
-        <div className="relative mx-auto grid max-w-[1440px] gap-10 px-5 py-16 sm:px-8 md:py-20 lg:py-24">
+        <div className="relative mx-auto grid max-w-[1440px] gap-8 px-5 py-12 sm:px-8 md:py-16 lg:py-20">
           <div className="max-w-3xl">
-            <span className="mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em]" style={{ color: primary }}>
+            <span className="mb-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em]" style={{ color: primary }}>
               <span className="h-0.5 w-7" style={{ backgroundColor: primary }} /> Portfolio
             </span>
             <h1 className="text-4xl font-black leading-[1.05] text-white sm:text-5xl lg:text-6xl">
               Aircraft engineered for <span style={{ color: primary }}>your mission.</span>
             </h1>
-            <p className="mt-6 text-base leading-relaxed text-white/70 sm:text-lg">
+            <p className="mt-5 text-base leading-relaxed text-white/70 sm:text-lg">
               ASP Aero Tech develops configurable UAS platforms spanning persistent ISR, tactical awareness, industrial inspection, and autonomous field operations. Select a mission profile below to view capable platforms.
             </p>
           </div>
@@ -45,7 +45,7 @@ export function ProductsPage() {
 
       <section className="bg-[#FAFAF8] border-b border-gray-100 sticky top-[76px] z-30">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
-          <div className="flex gap-6 overflow-x-auto py-4 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto py-3 scrollbar-hide">
             {productCategories.map(cat => (
               <button
                 key={cat}
@@ -63,9 +63,9 @@ export function ProductsPage() {
         </div>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-12 sm:py-16">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
-          <div className="mb-10">
+          <div className="mb-8">
             <h2 className="text-2xl font-black text-[#0B203D]">
               {activeCategory} Platforms
             </h2>
@@ -74,7 +74,7 @@ export function ProductsPage() {
             </p>
           </div>
           
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {isLoading && (
               <div className="col-span-full flex items-center justify-center py-16 text-[#F47E20]">
                 <Loader2 className="h-8 w-8 animate-spin" />
@@ -132,12 +132,12 @@ export function ProductsPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F1E8] py-20">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-7 px-5 sm:px-8 md:flex-row md:items-center">
+      <section className="bg-[#F6F1E8] py-16">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-6 px-5 sm:px-8 md:flex-row md:items-center">
           <div>
             <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: orange }}>Need a custom configuration?</span>
             <h2 className="mt-2 text-3xl font-black text-[#0B203D]">Define the operating envelope with our engineers.</h2>
-            <p className="mt-3 text-sm text-gray-600">Share the mission, payload, range, endurance, and deployment conditions to identify the right system architecture.</p>
+            <p className="mt-2 text-sm text-gray-600">Share the mission, payload, range, endurance, and deployment conditions to identify the right system architecture.</p>
           </div>
           <Link href="/contact" className="inline-flex shrink-0 items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5" style={{ backgroundColor: orange }}>
             Request a briefing <ArrowRight size={15} />
@@ -218,10 +218,10 @@ export function ProductDetailPage({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-start">
+      <section className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-start">
           {/* Left: Image & Features */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 shadow-lg">
               <img 
                 src={productImageUrl(product.image)}
@@ -231,7 +231,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
               <div className="absolute bottom-0 left-0 right-0 bg-[#0B203D]/90 backdrop-blur border-t border-white/10">
                 <div className="flex divide-x divide-white/10 text-center">
                   {product.features.map(feature => (
-                    <div key={feature} className="flex-1 py-3 px-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
+                    <div key={feature} className="flex-1 py-3 px-2 flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white">
                       <Check size={14} style={{ color: primary }} /> {feature}
                     </div>
                   ))}
@@ -242,7 +242,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
             <div className="flex flex-wrap gap-2">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mr-2 py-1">Mission Profiles:</span>
               {product.categories.map(cat => (
-                <span key={cat} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                <span key={cat} className="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600">
                   {cat}
                 </span>
               ))}
@@ -251,18 +251,18 @@ export function ProductDetailPage({ slug }: { slug: string }) {
 
           {/* Right: Info & Specs */}
           <div>
-            <span className="mb-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em]" style={{ color: primary }}>
+            <span className="mb-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em]" style={{ color: primary }}>
               <span className="h-0.5 w-6" style={{ backgroundColor: primary }} /> Platform Detail
             </span>
             <h1 className="text-4xl font-black text-[#0B203D] sm:text-5xl">{product.name}</h1>
-            <p className="mt-6 text-lg leading-relaxed text-gray-600">{product.description}</p>
+            <p className="mt-5 text-base leading-relaxed text-gray-600">{product.description}</p>
             
-            <div className="mt-10 rounded-2xl border border-gray-100 bg-[#FAFAF8] p-8 shadow-sm">
-              <h2 className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em]" style={{ color: blue }}>
+            <div className="mt-8 rounded-2xl border border-gray-100 bg-[#FAFAF8] p-6 shadow-sm">
+              <h2 className="mb-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em]" style={{ color: blue }}>
                 Technical Specifications
               </h2>
               
-              <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
                 {Object.entries(product.specs).map(([key, value]) => {
                   if (!value) return null;
                   const specKey = key as keyof typeof specIcons;
@@ -283,7 +283,7 @@ export function ProductDetailPage({ slug }: { slug: string }) {
               </div>
             </div>
             
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/contact" className="inline-flex items-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold text-white shadow-md transition-transform hover:-translate-y-0.5 hover:shadow-lg" style={{ backgroundColor: primary }}>
                 Request technical briefing <ArrowRight size={16} />
               </Link>

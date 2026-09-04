@@ -52,7 +52,7 @@ export function DynamicHero() {
 
   return (
     <section
-      className="relative min-h-[610px] overflow-hidden bg-[#0B203D] sm:min-h-[660px] lg:min-h-[690px]"
+      className="relative min-h-[500px] overflow-hidden bg-[#0B203D] sm:min-h-[550px] lg:min-h-[600px]"
       aria-roledescription="carousel"
       aria-label="ASP Aero Tech highlights"
       data-testid="section-dynamic-hero"
@@ -76,9 +76,9 @@ export function DynamicHero() {
         </div>
       ))}
 
-      <div className="relative mx-auto flex min-h-[610px] max-w-[1440px] items-center px-5 py-20 sm:min-h-[660px] sm:px-8 lg:min-h-[690px]">
+      <div className="relative mx-auto flex min-h-[500px] max-w-[1440px] items-center px-5 py-16 sm:min-h-[550px] sm:px-8 lg:min-h-[600px]">
         <div className="max-w-3xl">
-          <div className="mb-5 flex flex-wrap items-center gap-3">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#F47E20]">
               <span className="h-0.5 w-8 bg-[#F47E20]" />
               {slide.eyebrow || "ASP Aero Tech"}
@@ -90,33 +90,33 @@ export function DynamicHero() {
             )}
           </div>
           <h1
-            className="max-w-3xl text-4xl font-black leading-[.98] tracking-tight text-white sm:text-6xl lg:text-[76px]"
+            className="max-w-3xl text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[64px]"
             data-testid="text-hero-title"
           >
             {slide.title}
           </h1>
           {slide.subtitle && (
-            <p className="mt-7 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
               {slide.subtitle}
             </p>
           )}
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href={safeLink(slide.ctaUrl)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#F47E20] px-6 py-3.5 text-sm font-bold text-white shadow-lg transition-transform hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#F47E20] px-5 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:-translate-y-0.5"
               data-testid="link-hero-primary"
             >
               {slide.ctaText || "Request a briefing"} <ArrowRight size={16} />
             </Link>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
               data-testid="link-hero-products"
             >
               Explore platforms <ChevronRight size={16} />
             </Link>
           </div>
-          <div className="mt-10 grid max-w-2xl gap-3 text-xs font-bold uppercase tracking-wider text-white/55 sm:grid-cols-3">
+          <div className="mt-8 grid max-w-2xl gap-3 text-xs font-bold uppercase tracking-wider text-white/55 sm:grid-cols-3">
             {[slide.stat1, slide.stat2, slide.stat3].filter(Boolean).map((stat) => (
               <span key={stat} className="flex items-start gap-2">
                 <Check className="mt-0.5 shrink-0 text-[#F47E20]" size={14} />
