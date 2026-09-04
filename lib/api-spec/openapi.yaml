@@ -20,6 +20,10 @@ tags:
     description: Persistent product image storage
   - name: admin
     description: Protected content management operations
+  - name: settings
+    description: Public-safe and protected site settings
+  - name: marketing
+    description: Protected campaign drafting, recipient preparation, reports, and AI copy generation
 paths:
   /healthz:
     get:
@@ -59,6 +63,106 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /settings:
+    get:
+      operationId: getPublicSettings
+      tags: [settings]
+      summary: Get public-safe site settings
+      responses:
+        "200":
+          description: Public settings only; no provider credentials or API keys
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SiteSettings" }
+  /admin/settings:
+    get:
+      operationId: getAdminSettings
+      tags: [settings]
+      summary: Get editable site settings
+      responses:
+        "200":
+          description: Settings
+          content: { application/json: { schema: { $ref: "#/components/schemas/SiteSettings" } } }
+        "401": { description: Authentication required }
+    put:
+      operationId: updateAdminSettings
+      tags: [settings]
+      summary: Save editable site settings
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/SiteSettingsInput" } } }
+      responses:
+        "200":
+          description: Saved settings
+          content: { application/json: { schema: { $ref: "#/components/schemas/SiteSettings" } } }
+        "400": { description: Invalid settings }
+        "401": { description: Authentication required }
+  /admin/marketing/overview:
+    get:
+      operationId: getMarketingOverview
+      tags: [marketing]
+      summary: Get marketing counts
+      responses:
+        "200": { description: Marketing overview, content: { application/json: { schema: { $ref: "#/components/schemas/MarketingOverview" } } } }
+  /admin/campaigns:
+    get:
+      operationId: listCampaigns
+      tags: [marketing]
+      summary: List campaigns
+      responses:
+        "200": { description: Campaigns, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Campaign" } } } } }
+    post:
+      operationId: createCampaign
+      tags: [marketing]
+      summary: Create a campaign draft
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CampaignInput" } } } }
+      responses:
+        "201": { description: Campaign draft, content: { application/json: { schema: { $ref: "#/components/schemas/Campaign" } } } }
+  /admin/campaigns/{id}:
+    get:
+      operationId: getCampaign
+      tags: [marketing]
+      summary: Get a campaign and prepared recipients
+      parameters: [{ name: id, in: path, required: true, schema: { type: number } }]
+      responses:
+        "200": { description: Campaign, content: { application/json: { schema: { $ref: "#/components/schemas/CampaignDetail" } } } }
+    patch:
+      operationId: updateCampaign
+      tags: [marketing]
+      summary: Update a draft or scheduled campaign
+      parameters: [{ name: id, in: path, required: true, schema: { type: number } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CampaignPatch" } } } }
+      responses:
+        "200": { description: Updated campaign, content: { application/json: { schema: { $ref: "#/components/schemas/Campaign" } } } }
+    delete:
+      operationId: deleteCampaign
+      tags: [marketing]
+      summary: Delete a campaign
+      parameters: [{ name: id, in: path, required: true, schema: { type: number } }]
+      responses: { "204": { description: Deleted } }
+  /admin/campaigns/{id}/prepare:
+    post:
+      operationId: prepareCampaignRecipients
+      tags: [marketing]
+      summary: Prepare campaign recipients without sending delivery messages
+      parameters: [{ name: id, in: path, required: true, schema: { type: number } }]
+      responses:
+        "200": { description: Recipients prepared, content: { application/json: { schema: { $ref: "#/components/schemas/CampaignPreparation" } } } }
+  /admin/marketing/reports:
+    get:
+      operationId: getMarketingReports
+      tags: [marketing]
+      summary: Get supported campaign and usage reports
+      responses:
+        "200": { description: Reports, content: { application/json: { schema: { $ref: "#/components/schemas/MarketingReports" } } } }
+  /admin/ai-studio/generate:
+    post:
+      operationId: generateMarketingCopy
+      tags: [marketing]
+      summary: Generate marketing copy through the server-side OpenAI integration
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AiCopyInput" } } } }
+      responses:
+        "200": { description: Generated copy, content: { application/json: { schema: { $ref: "#/components/schemas/AiCopyResponse" } } } }
   /products:
     get:
       operationId: listProducts
@@ -487,12 +591,17 @@ components:
           type: string
         email:
           type: string
+          pattern: '^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        phone:
+          type: string
         organization:
           type: ["string", "null"]
         interest:
           type: string
         message:
-          type: string
+          type: ["string", "null"]
+        marketingConsent:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -500,9 +609,11 @@ components:
         - id
         - name
         - email
+        - phone
         - organization
         - interest
         - message
+        - marketingConsent
         - createdAt
     InquiryInput:
       type: object
@@ -512,20 +623,25 @@ components:
           minLength: 2
         email:
           type: string
+          pattern: '^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        phone:
+          type: string
+          minLength: 7
         organization:
           type: string
-          minLength: 2
         interest:
           type: string
-          minLength: 2
+          minLength: 1
         message:
           type: string
-          minLength: 10
+        marketingConsent:
+          type: boolean
       required:
         - name
         - email
+        - phone
         - interest
-        - message
+        - marketingConsent
     HeroSlide:
       type: object
       properties:
@@ -659,6 +775,105 @@ components:
         metadata:
           $ref: "#/components/schemas/UploadUrlRequest"
       required: [uploadURL, objectPath, metadata]
+    SiteSettings:
+      type: object
+      properties:
+        siteName: { type: ["string", "null"] }
+        tagline: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        contactEmail: { type: ["string", "null"] }
+        contactPhone: { type: ["string", "null"] }
+        contactPhone2: { type: ["string", "null"] }
+        address: { type: ["string", "null"] }
+        whatsappNumber: { type: ["string", "null"] }
+        whatsappGreeting: { type: ["string", "null"] }
+        linkedinUrl: { type: ["string", "null"] }
+        twitterUrl: { type: ["string", "null"] }
+        facebookUrl: { type: ["string", "null"] }
+        instagramUrl: { type: ["string", "null"] }
+        youtubeUrl: { type: ["string", "null"] }
+        primaryColor: { type: ["string", "null"] }
+        secondaryColor: { type: ["string", "null"] }
+        accentColor: { type: ["string", "null"] }
+        theme: { type: ["string", "null"] }
+        backgroundColor: { type: ["string", "null"] }
+        fontFamily: { type: ["string", "null"] }
+        chatbotEnabled: { type: ["boolean", "null"] }
+        chatbotName: { type: ["string", "null"] }
+        chatbotGreeting: { type: ["string", "null"] }
+        bannerHeight: { type: ["number", "null"] }
+        bannerSpeed: { type: ["number", "null"] }
+    SiteSettingsInput:
+      allOf:
+        - $ref: "#/components/schemas/SiteSettings"
+    Campaign:
+      type: object
+      properties:
+        id: { type: number }
+        name: { type: string }
+        type: { type: string, enum: [email, sms, whatsapp] }
+        subject: { type: ["string", "null"] }
+        body: { type: string }
+        status: { type: string, enum: [draft, scheduled] }
+        audienceFilter: { type: object, additionalProperties: true }
+        stats: { type: object, additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+      required: [id, name, type, body, status, audienceFilter, stats, createdAt, updatedAt, sentAt]
+    CampaignInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        type: { type: string, enum: [email, sms, whatsapp] }
+        subject: { type: string }
+        body: { type: string }
+        audienceFilter: { type: object, additionalProperties: true }
+      required: [name, type]
+    CampaignPatch:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        type: { type: string, enum: [email, sms, whatsapp] }
+        subject: { type: string }
+        body: { type: string }
+        status: { type: string, enum: [draft, scheduled] }
+        audienceFilter: { type: object, additionalProperties: true }
+    CampaignRecipient:
+      type: object
+      additionalProperties: true
+    CampaignDetail:
+      allOf:
+        - $ref: "#/components/schemas/Campaign"
+        - type: object
+          properties:
+            recipients: { type: array, items: { $ref: "#/components/schemas/CampaignRecipient" } }
+          required: [recipients]
+    CampaignPreparation:
+      type: object
+      properties:
+        campaignId: { type: number }
+        totalRecipients: { type: number }
+        delivery: { type: string, enum: [not_sent_no_provider] }
+      required: [campaignId, totalRecipients, delivery]
+    MarketingOverview:
+      type: object
+      additionalProperties: true
+    MarketingReports:
+      type: object
+      additionalProperties: true
+    AiCopyInput:
+      type: object
+      properties:
+        prompt: { type: string, minLength: 1, maxLength: 12000 }
+      required: [prompt]
+    AiCopyResponse:
+      type: object
+      properties:
+        copy: { type: string }
+      required: [copy]
     AdminUser:
       type: object
       properties:

@@ -12,24 +12,30 @@ export interface HealthStatus {
 export interface Inquiry {
   id: string;
   name: string;
+  /** @pattern ^[^\s@]+@[^\s@]+\.[^\s@]+$ */
   email: string;
+  phone: string;
   /** @nullable */
   organization: string | null;
   interest: string;
-  message: string;
+  /** @nullable */
+  message: string | null;
+  marketingConsent: boolean;
   createdAt: string;
 }
 
 export interface InquiryInput {
   /** @minLength 2 */
   name: string;
+  /** @pattern ^[^\s@]+@[^\s@]+\.[^\s@]+$ */
   email: string;
-  /** @minLength 2 */
+  /** @minLength 7 */
+  phone: string;
   organization?: string;
-  /** @minLength 2 */
+  /** @minLength 1 */
   interest: string;
-  /** @minLength 10 */
-  message: string;
+  message?: string;
+  marketingConsent: boolean;
 }
 
 export interface HeroSlide {
@@ -119,6 +125,186 @@ export interface UploadUrlResponse {
   uploadURL: string;
   objectPath: string;
   metadata: UploadUrlRequest;
+}
+
+export interface SiteSettings {
+  /** @nullable */
+  siteName?: string | null;
+  /** @nullable */
+  tagline?: string | null;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+  /** @nullable */
+  faviconUrl?: string | null;
+  /** @nullable */
+  contactEmail?: string | null;
+  /** @nullable */
+  contactPhone?: string | null;
+  /** @nullable */
+  contactPhone2?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  whatsappNumber?: string | null;
+  /** @nullable */
+  whatsappGreeting?: string | null;
+  /** @nullable */
+  linkedinUrl?: string | null;
+  /** @nullable */
+  twitterUrl?: string | null;
+  /** @nullable */
+  facebookUrl?: string | null;
+  /** @nullable */
+  instagramUrl?: string | null;
+  /** @nullable */
+  youtubeUrl?: string | null;
+  /** @nullable */
+  primaryColor?: string | null;
+  /** @nullable */
+  secondaryColor?: string | null;
+  /** @nullable */
+  accentColor?: string | null;
+  /** @nullable */
+  theme?: string | null;
+  /** @nullable */
+  backgroundColor?: string | null;
+  /** @nullable */
+  fontFamily?: string | null;
+  /** @nullable */
+  chatbotEnabled?: boolean | null;
+  /** @nullable */
+  chatbotName?: string | null;
+  /** @nullable */
+  chatbotGreeting?: string | null;
+  /** @nullable */
+  bannerHeight?: number | null;
+  /** @nullable */
+  bannerSpeed?: number | null;
+}
+
+export type SiteSettingsInput = SiteSettings;
+
+export type CampaignType = typeof CampaignType[keyof typeof CampaignType];
+
+
+export const CampaignType = {
+  email: 'email',
+  sms: 'sms',
+  whatsapp: 'whatsapp',
+} as const;
+
+export type CampaignStatus = typeof CampaignStatus[keyof typeof CampaignStatus];
+
+
+export const CampaignStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+} as const;
+
+export type CampaignAudienceFilter = { [key: string]: unknown };
+
+export type CampaignStats = { [key: string]: unknown };
+
+export interface Campaign {
+  id: number;
+  name: string;
+  type: CampaignType;
+  /** @nullable */
+  subject?: string | null;
+  body: string;
+  status: CampaignStatus;
+  audienceFilter: CampaignAudienceFilter;
+  stats: CampaignStats;
+  createdAt: string;
+  updatedAt: string;
+  /** @nullable */
+  sentAt: string | null;
+}
+
+export type CampaignInputType = typeof CampaignInputType[keyof typeof CampaignInputType];
+
+
+export const CampaignInputType = {
+  email: 'email',
+  sms: 'sms',
+  whatsapp: 'whatsapp',
+} as const;
+
+export type CampaignInputAudienceFilter = { [key: string]: unknown };
+
+export interface CampaignInput {
+  /** @minLength 1 */
+  name: string;
+  type: CampaignInputType;
+  subject?: string;
+  body?: string;
+  audienceFilter?: CampaignInputAudienceFilter;
+}
+
+export type CampaignPatchType = typeof CampaignPatchType[keyof typeof CampaignPatchType];
+
+
+export const CampaignPatchType = {
+  email: 'email',
+  sms: 'sms',
+  whatsapp: 'whatsapp',
+} as const;
+
+export type CampaignPatchStatus = typeof CampaignPatchStatus[keyof typeof CampaignPatchStatus];
+
+
+export const CampaignPatchStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+} as const;
+
+export type CampaignPatchAudienceFilter = { [key: string]: unknown };
+
+export interface CampaignPatch {
+  /** @minLength 1 */
+  name?: string;
+  type?: CampaignPatchType;
+  subject?: string;
+  body?: string;
+  status?: CampaignPatchStatus;
+  audienceFilter?: CampaignPatchAudienceFilter;
+}
+
+export interface CampaignRecipient { [key: string]: unknown }
+
+export type CampaignDetail = Campaign & {
+  recipients: CampaignRecipient[];
+};
+
+export type CampaignPreparationDelivery = typeof CampaignPreparationDelivery[keyof typeof CampaignPreparationDelivery];
+
+
+export const CampaignPreparationDelivery = {
+  not_sent_no_provider: 'not_sent_no_provider',
+} as const;
+
+export interface CampaignPreparation {
+  campaignId: number;
+  totalRecipients: number;
+  delivery: CampaignPreparationDelivery;
+}
+
+export interface MarketingOverview { [key: string]: unknown }
+
+export interface MarketingReports { [key: string]: unknown }
+
+export interface AiCopyInput {
+  /**
+     * @minLength 1
+     * @maxLength 12000
+     */
+  prompt: string;
+}
+
+export interface AiCopyResponse {
+  copy: string;
 }
 
 export interface AdminUser {

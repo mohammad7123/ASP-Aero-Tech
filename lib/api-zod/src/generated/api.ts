@@ -23,30 +23,325 @@ export const HealthCheckResponse = zod.object({
  */
 export const createInquiryBodyNameMin = 2;
 
-export const createInquiryBodyOrganizationMin = 2;
+export const createInquiryBodyEmailRegExp = new RegExp('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
+export const createInquiryBodyPhoneMin = 7;
 
-export const createInquiryBodyInterestMin = 2;
-
-export const createInquiryBodyMessageMin = 10;
 
 
 
 export const CreateInquiryBody = zod.object({
   "name": zod.string().min(createInquiryBodyNameMin),
-  "email": zod.string(),
-  "organization": zod.string().min(createInquiryBodyOrganizationMin).optional(),
-  "interest": zod.string().min(createInquiryBodyInterestMin),
-  "message": zod.string().min(createInquiryBodyMessageMin)
+  "email": zod.string().regex(createInquiryBodyEmailRegExp),
+  "phone": zod.string().min(createInquiryBodyPhoneMin),
+  "organization": zod.string().optional(),
+  "interest": zod.string().min(1),
+  "message": zod.string().optional(),
+  "marketingConsent": zod.boolean()
 })
+
+export const createInquiryResponseEmailRegExp = new RegExp('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
+
 
 export const CreateInquiryResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.string(),
+  "email": zod.string().regex(createInquiryResponseEmailRegExp),
+  "phone": zod.string(),
   "organization": zod.string().nullable(),
   "interest": zod.string(),
-  "message": zod.string(),
+  "message": zod.string().nullable(),
+  "marketingConsent": zod.boolean(),
   "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get public-safe site settings
+ */
+export const GetPublicSettingsResponse = zod.object({
+  "siteName": zod.string().nullish(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "contactPhone2": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "whatsappNumber": zod.string().nullish(),
+  "whatsappGreeting": zod.string().nullish(),
+  "linkedinUrl": zod.string().nullish(),
+  "twitterUrl": zod.string().nullish(),
+  "facebookUrl": zod.string().nullish(),
+  "instagramUrl": zod.string().nullish(),
+  "youtubeUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "secondaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "theme": zod.string().nullish(),
+  "backgroundColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "chatbotEnabled": zod.boolean().nullish(),
+  "chatbotName": zod.string().nullish(),
+  "chatbotGreeting": zod.string().nullish(),
+  "bannerHeight": zod.number().nullish(),
+  "bannerSpeed": zod.number().nullish()
+})
+
+
+/**
+ * @summary Get editable site settings
+ */
+export const GetAdminSettingsResponse = zod.object({
+  "siteName": zod.string().nullish(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "contactPhone2": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "whatsappNumber": zod.string().nullish(),
+  "whatsappGreeting": zod.string().nullish(),
+  "linkedinUrl": zod.string().nullish(),
+  "twitterUrl": zod.string().nullish(),
+  "facebookUrl": zod.string().nullish(),
+  "instagramUrl": zod.string().nullish(),
+  "youtubeUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "secondaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "theme": zod.string().nullish(),
+  "backgroundColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "chatbotEnabled": zod.boolean().nullish(),
+  "chatbotName": zod.string().nullish(),
+  "chatbotGreeting": zod.string().nullish(),
+  "bannerHeight": zod.number().nullish(),
+  "bannerSpeed": zod.number().nullish()
+})
+
+
+/**
+ * @summary Save editable site settings
+ */
+export const UpdateAdminSettingsBody = zod.object({
+  "siteName": zod.string().nullish(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "contactPhone2": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "whatsappNumber": zod.string().nullish(),
+  "whatsappGreeting": zod.string().nullish(),
+  "linkedinUrl": zod.string().nullish(),
+  "twitterUrl": zod.string().nullish(),
+  "facebookUrl": zod.string().nullish(),
+  "instagramUrl": zod.string().nullish(),
+  "youtubeUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "secondaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "theme": zod.string().nullish(),
+  "backgroundColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "chatbotEnabled": zod.boolean().nullish(),
+  "chatbotName": zod.string().nullish(),
+  "chatbotGreeting": zod.string().nullish(),
+  "bannerHeight": zod.number().nullish(),
+  "bannerSpeed": zod.number().nullish()
+})
+
+export const UpdateAdminSettingsResponse = zod.object({
+  "siteName": zod.string().nullish(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "contactPhone2": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "whatsappNumber": zod.string().nullish(),
+  "whatsappGreeting": zod.string().nullish(),
+  "linkedinUrl": zod.string().nullish(),
+  "twitterUrl": zod.string().nullish(),
+  "facebookUrl": zod.string().nullish(),
+  "instagramUrl": zod.string().nullish(),
+  "youtubeUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "secondaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "theme": zod.string().nullish(),
+  "backgroundColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "chatbotEnabled": zod.boolean().nullish(),
+  "chatbotName": zod.string().nullish(),
+  "chatbotGreeting": zod.string().nullish(),
+  "bannerHeight": zod.number().nullish(),
+  "bannerSpeed": zod.number().nullish()
+})
+
+
+/**
+ * @summary Get marketing counts
+ */
+export const GetMarketingOverviewResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary List campaigns
+ */
+export const ListCampaignsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().nullish(),
+  "body": zod.string(),
+  "status": zod.enum(['draft', 'scheduled']),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()),
+  "stats": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullable()
+})
+export const ListCampaignsResponse = zod.array(ListCampaignsResponseItem)
+
+
+/**
+ * @summary Create a campaign draft
+ */
+
+
+
+export const CreateCampaignBody = zod.object({
+  "name": zod.string().min(1),
+  "type": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().optional(),
+  "body": zod.string().optional(),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()).optional()
+})
+
+export const CreateCampaignResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().nullish(),
+  "body": zod.string(),
+  "status": zod.enum(['draft', 'scheduled']),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()),
+  "stats": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Get a campaign and prepared recipients
+ */
+export const GetCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetCampaignResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().nullish(),
+  "body": zod.string(),
+  "status": zod.enum(['draft', 'scheduled']),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()),
+  "stats": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullable()
+}).and(zod.object({
+  "recipients": zod.array(zod.record(zod.string(), zod.unknown()))
+}))
+
+
+/**
+ * @summary Update a draft or scheduled campaign
+ */
+export const UpdateCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateCampaignBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "type": zod.enum(['email', 'sms', 'whatsapp']).optional(),
+  "subject": zod.string().optional(),
+  "body": zod.string().optional(),
+  "status": zod.enum(['draft', 'scheduled']).optional(),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()).optional()
+})
+
+export const UpdateCampaignResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().nullish(),
+  "body": zod.string(),
+  "status": zod.enum(['draft', 'scheduled']),
+  "audienceFilter": zod.record(zod.string(), zod.unknown()),
+  "stats": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Delete a campaign
+ */
+export const DeleteCampaignParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteCampaignResponse = zod.void()
+
+
+/**
+ * @summary Prepare campaign recipients without sending delivery messages
+ */
+export const PrepareCampaignRecipientsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PrepareCampaignRecipientsResponse = zod.object({
+  "campaignId": zod.number(),
+  "totalRecipients": zod.number(),
+  "delivery": zod.enum(['not_sent_no_provider'])
+})
+
+
+/**
+ * @summary Get supported campaign and usage reports
+ */
+export const GetMarketingReportsResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary Generate marketing copy through the server-side OpenAI integration
+ */
+export const generateMarketingCopyBodyPromptMax = 12000;
+
+
+
+export const GenerateMarketingCopyBody = zod.object({
+  "prompt": zod.string().min(1).max(generateMarketingCopyBodyPromptMax)
+})
+
+export const GenerateMarketingCopyResponse = zod.object({
+  "copy": zod.string()
 })
 
 

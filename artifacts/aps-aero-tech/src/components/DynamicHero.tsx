@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
-import { getListHeroSlidesQueryKey, useListHeroSlides } from "@workspace/api-client-react";
+import { getListHeroSlidesQueryKey, useListHeroSlides, useGetPublicSettings } from "@workspace/api-client-react";
 import type { HeroSlide } from "@workspace/api-client-react";
 
 const fallbackSlides: HeroSlide[] = [
@@ -32,8 +32,12 @@ export function DynamicHero() {
   const { data, isLoading } = useListHeroSlides({
     query: { queryKey: getListHeroSlidesQueryKey(), staleTime: 30_000, refetchOnMount: "always" },
   });
+  const { data: settings } = useGetPublicSettings();
   const slides = data?.length ? data : fallbackSlides;
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const bannerSpeed = settings?.bannerSpeed ? Math.max(1000, Math.min(60000, settings.bannerSpeed)) : 7000;
+  const bannerHeight = settings?.bannerHeight ? Math.max(300, Math.min(1000, settings.bannerHeight)) : null;
 
   useEffect(() => {
     setActiveIndex((current) => Math.min(current, slides.length - 1));
@@ -43,16 +47,19 @@ export function DynamicHero() {
     if (slides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
-    }, 7000);
+    }, bannerSpeed);
     return () => window.clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, bannerSpeed]);
 
   const slide = slides[activeIndex] ?? slides[0];
   const goTo = (index: number) => setActiveIndex((index + slides.length) % slides.length);
 
+  const minHeightStyle = bannerHeight ? { minHeight: `${bannerHeight}px` } : {};
+
   return (
     <section
-      className="relative min-h-[500px] overflow-hidden bg-[#0B203D] sm:min-h-[550px] lg:min-h-[600px]"
+      className="relative overflow-hidden bg-[#0B203D]"
+      style={minHeightStyle.minHeight ? { minHeight: minHeightStyle.minHeight } : { minHeight: '500px' }}
       aria-roledescription="carousel"
       aria-label="ASP Aero Tech highlights"
       data-testid="section-dynamic-hero"
@@ -76,7 +83,7 @@ export function DynamicHero() {
         </div>
       ))}
 
-      <div className="relative mx-auto flex min-h-[500px] max-w-[1440px] items-center px-5 py-16 sm:min-h-[550px] sm:px-8 lg:min-h-[600px]">
+      <div className="relative mx-auto flex max-w-[1440px] items-center px-5 py-16 sm:px-8" style={minHeightStyle.minHeight ? { minHeight: minHeightStyle.minHeight } : { minHeight: '500px' }}>
         <div className="max-w-3xl">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#F47E20]">

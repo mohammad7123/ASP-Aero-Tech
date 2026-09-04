@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter"
-import { LayoutDashboard, Users, MessageSquare, Briefcase, FileText, Image, Settings, Layers, Box, Factory, Mail, Menu, Newspaper, Target } from "lucide-react"
+import { LayoutDashboard, Users, MessageSquare, Briefcase, FileText, Image, Settings, Layers, Box, Factory, Mail, Menu, Newspaper, Target, Megaphone } from "lucide-react"
 import { cn } from "@/components/ui/button"
 
 export const ADMIN_RESOURCES = [
@@ -16,10 +16,8 @@ export const ADMIN_RESOURCES = [
   { id: "applications", label: "Applications", icon: FileText },
   { id: "blog-categories", label: "Blog Categories", icon: Layers },
   { id: "blog-posts", label: "Blog Posts", icon: Newspaper },
-  { id: "campaigns", label: "Campaigns", icon: Target },
   { id: "menu-items", label: "Menu Items", icon: Menu },
   { id: "media", label: "Media Library", icon: Image },
-  { id: "settings", label: "System Settings", icon: Settings },
 ]
 
 export function Sidebar() {
@@ -50,6 +48,28 @@ export function Sidebar() {
             )}>
               <LayoutDashboard className={cn("w-4 h-4", location === "/admin" ? "text-primary" : "group-hover:text-primary")} />
               Overview
+            </span>
+          </Link>
+          <Link href="/admin/marketing">
+            <span className={cn(
+              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
+              location.startsWith("/admin/marketing")
+                ? "bg-primary/20 text-primary border border-primary/30"
+                : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
+            )}>
+              <Megaphone className={cn("w-4 h-4", location.startsWith("/admin/marketing") ? "text-primary" : "group-hover:text-primary")} />
+              Marketing Hub
+            </span>
+          </Link>
+          <Link href="/admin/settings">
+            <span className={cn(
+              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
+              location.startsWith("/admin/settings")
+                ? "bg-primary/20 text-primary border border-primary/30"
+                : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
+            )}>
+              <Settings className={cn("w-4 h-4", location.startsWith("/admin/settings") ? "text-primary" : "group-hover:text-primary")} />
+              System Settings
             </span>
           </Link>
         </div>

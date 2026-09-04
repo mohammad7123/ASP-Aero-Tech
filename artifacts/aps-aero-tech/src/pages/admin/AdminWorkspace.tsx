@@ -1,6 +1,8 @@
 import { Route, Switch, useLocation } from "wouter"
 import { AdminOverview } from "./AdminOverview"
 import { AdminResourceView } from "./AdminResourceView"
+import { AdminSettings } from "./Settings"
+import { AdminMarketing } from "./Marketing"
 import { ADMIN_RESOURCES, Sidebar } from "./Sidebar"
 import { Shield, LogOut } from "lucide-react"
 import { useAdminLogout, getGetAdminSessionQueryKey } from "@workspace/api-client-react"
@@ -58,6 +60,8 @@ export function AdminWorkspace() {
               data-testid="select-admin-mobile-navigation"
             >
               <option value="/admin">Overview</option>
+              <option value="/admin/marketing">Marketing Hub</option>
+              <option value="/admin/settings">System Settings</option>
               {ADMIN_RESOURCES.map((resource) => (
                 <option key={resource.id} value={`/admin/resources/${resource.id}`}>
                   {resource.label}
@@ -72,6 +76,8 @@ export function AdminWorkspace() {
           <div className="max-w-7xl mx-auto w-full">
             <Switch>
               <Route path="/admin" component={AdminOverview} />
+              <Route path="/admin/settings" component={AdminSettings} />
+              <Route path="/admin/marketing" component={AdminMarketing} />
               <Route path="/admin/resources/:resource" component={AdminResourceView} />
             </Switch>
           </div>

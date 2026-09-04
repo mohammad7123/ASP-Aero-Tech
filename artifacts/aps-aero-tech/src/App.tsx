@@ -26,6 +26,8 @@ function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
+        <Route path="/admin/settings" component={AdminPage} />
+        <Route path="/admin/marketing" component={AdminPage} />
         <Route path="/admin/resources/:resource" component={AdminPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/about" component={ImportedSite} />

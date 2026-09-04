@@ -9,10 +9,14 @@
 export interface Inquiry {
   id: string;
   name: string;
+  /** @pattern ^[^\s@]+@[^\s@]+\.[^\s@]+$ */
   email: string;
+  phone: string;
   /** @nullable */
   organization: string | null;
   interest: string;
-  message: string;
+  /** @nullable */
+  message: string | null;
+  marketingConsent: boolean;
   createdAt: Date;
 }

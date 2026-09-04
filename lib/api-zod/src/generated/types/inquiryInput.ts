@@ -9,11 +9,13 @@
 export interface InquiryInput {
   /** @minLength 2 */
   name: string;
+  /** @pattern ^[^\s@]+@[^\s@]+\.[^\s@]+$ */
   email: string;
-  /** @minLength 2 */
+  /** @minLength 7 */
+  phone: string;
   organization?: string;
-  /** @minLength 2 */
+  /** @minLength 1 */
   interest: string;
-  /** @minLength 10 */
-  message: string;
+  message?: string;
+  marketingConsent: boolean;
 }

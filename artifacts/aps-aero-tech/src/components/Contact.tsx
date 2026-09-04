@@ -8,9 +8,11 @@ import { useState } from "react";
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Valid email is required"),
+  phone: z.string().regex(/^\+?[0-9().\-\s]{7,25}$/, "Enter a valid phone number, including country code when applicable"),
   organization: z.string().optional(),
   interest: z.string().min(1, "Please select an area of interest"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  message: z.string().optional(),
+  marketingConsent: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -23,9 +25,11 @@ export function Contact() {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
       organization: "",
       interest: "",
-      message: ""
+      message: "",
+      marketingConsent: true,
     }
   });
 
@@ -74,7 +78,7 @@ export function Contact() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Full Name</label>
-                  <input 
+                  <input
                     {...register("name")}
                     className="w-full bg-background border border-white/10 px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors focus:bg-primary/5"
                     placeholder="John Doe"
@@ -95,6 +99,16 @@ export function Contact() {
               
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
+                  <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Phone Number</label>
+                  <input
+                    {...register("phone")}
+                    type="tel"
+                    className="w-full bg-background border border-white/10 px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors focus:bg-primary/5"
+                    placeholder="+91 98765 43210"
+                  />
+                  {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>}
+                </div>
+                <div className="space-y-2">
                   <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Organization (Optional)</label>
                   <input 
                     {...register("organization")}
@@ -102,6 +116,9 @@ export function Contact() {
                     placeholder="Company or Agency"
                   />
                 </div>
+              </div>
+
+              <div className="grid md:grid-cols-1 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Area of Interest</label>
                   <select 
@@ -127,6 +144,18 @@ export function Contact() {
                   placeholder="Operational requirements..."
                 />
                 {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message.message}</p>}
+              </div>
+
+              <div className="flex items-start gap-3 p-4 border border-white/5 bg-white/5">
+                <input
+                  type="checkbox"
+                  id="marketingConsent"
+                  {...register("marketingConsent")}
+                  className="mt-1 w-4 h-4 accent-primary"
+                />
+                <label htmlFor="marketingConsent" className="text-xs text-muted-foreground leading-tight">
+                  I agree to receive marketing communications from ASP Aero Tech by email, phone, SMS, or WhatsApp. I can unsubscribe at any time.
+                </label>
               </div>
 
               {createInquiry.error && (
