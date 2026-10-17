@@ -7,6 +7,7 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, posts] = await Promise.all([getProducts(), getBlogPosts()]);
   const now = new Date();
+  const staticLastMod = new Date("2026-10-17T00:00:00Z");
   const pages: [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]][] = [
     ["/", 1, "weekly"],
     ["/products", 0.9, "weekly"],
@@ -21,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ["/privacy-policy", 0.2, "yearly"],
   ];
   return [
-    ...pages.map(([path, priority, changeFrequency]) => ({ url: absoluteUrl(path), lastModified: now, changeFrequency, priority })),
+    ...pages.map(([path, priority, changeFrequency]) => ({ url: absoluteUrl(path), lastModified: staticLastMod, changeFrequency, priority })),
     ...products.map((p) => ({ url: absoluteUrl(`/products/${p.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
     ...posts.map((p) => ({
       url: absoluteUrl(`/blog/${p.slug}`),
