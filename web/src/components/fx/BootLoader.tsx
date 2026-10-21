@@ -152,7 +152,7 @@ export function BootLoader({ enabled }: { enabled: boolean }) {
       </div>
 
       <div className="absolute bottom-6 left-6 hidden items-center gap-3 sm:flex">
-        <Logo alt="" width={120} height={55} priority className="h-8 w-auto opacity-90" />
+        <Logo alt="" width={120} height={41} priority className="h-8 w-auto opacity-90" />
         <span className="label-mono text-fg-dim">Advance System Platform</span>
       </div>
       <span className="label-mono absolute bottom-6 right-6 hidden text-fg-dim sm:block">21.1458° N · 79.0882° E</span>

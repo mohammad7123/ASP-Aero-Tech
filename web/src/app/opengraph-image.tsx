@@ -57,7 +57,7 @@ export default async function OpengraphImage() {
 
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logoSrc} width={196} height={90} alt="" />
+          <img src={logoSrc} width={240} height={82} alt="" />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", maxWidth: 700 }}>
