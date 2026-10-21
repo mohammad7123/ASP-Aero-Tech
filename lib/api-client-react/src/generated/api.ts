@@ -20,9 +20,15 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminAccountInput,
   AdminAuthResponse,
+  AdminChangePasswordInput,
+  AdminForgotPasswordInput,
+  AdminForgotPasswordResponse,
   AdminLoginInput,
   AdminOverview,
+  AdminResetPasswordInput,
+  AdminResetTokenStatus,
   AdminResourceInput,
   AdminResourceList,
   AdminResourceMutationResponse,
@@ -52,7 +58,8 @@ import type {
   SiteSettings,
   SiteSettingsInput,
   UploadUrlRequest,
-  UploadUrlResponse
+  UploadUrlResponse,
+  VerifyAdminResetTokenParams
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1942,6 +1949,374 @@ export const useAdminLogout = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminLogoutMutationOptions(options));
+    }
+
+export const getRequestAdminPasswordResetUrl = () => {
+
+
+
+
+  return `/api/admin/password/forgot`
+}
+
+/**
+ * @summary Send a password reset link to an administrator
+ */
+export const requestAdminPasswordReset = async (adminForgotPasswordInput: AdminForgotPasswordInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminForgotPasswordResponse> => {
+
+  return customFetch<AdminForgotPasswordResponse>(getRequestAdminPasswordResetUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminForgotPasswordInput)
+  }
+);}
+
+
+
+
+
+export const getRequestAdminPasswordResetMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAdminPasswordReset>>, TError,{data: BodyType<AdminForgotPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestAdminPasswordReset>>, TError,{data: BodyType<AdminForgotPasswordInput>}, TContext> => {
+
+const mutationKey = ['requestAdminPasswordReset'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestAdminPasswordReset>>, {data: BodyType<AdminForgotPasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestAdminPasswordReset(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestAdminPasswordResetMutationResult = NonNullable<Awaited<ReturnType<typeof requestAdminPasswordReset>>>
+    export type RequestAdminPasswordResetMutationBody = BodyType<AdminForgotPasswordInput>
+    export type RequestAdminPasswordResetMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Send a password reset link to an administrator
+ */
+export const useRequestAdminPasswordReset = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAdminPasswordReset>>, TError,{data: BodyType<AdminForgotPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestAdminPasswordReset>>,
+        TError,
+        {data: BodyType<AdminForgotPasswordInput>},
+        TContext
+      > => {
+      return useMutation(getRequestAdminPasswordResetMutationOptions(options));
+    }
+
+export const getVerifyAdminResetTokenUrl = (params: VerifyAdminResetTokenParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/password/reset?${stringifiedParams}` : `/api/admin/password/reset`
+}
+
+/**
+ * @summary Check whether a password reset token is still valid
+ */
+export const verifyAdminResetToken = async (params: VerifyAdminResetTokenParams, options?: Parameters<typeof customFetch>[1]): Promise<AdminResetTokenStatus> => {
+
+  return customFetch<AdminResetTokenStatus>(getVerifyAdminResetTokenUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getVerifyAdminResetTokenQueryKey = (params?: VerifyAdminResetTokenParams,) => {
+    return [
+    `/api/admin/password/reset`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getVerifyAdminResetTokenQueryOptions = <TData = Awaited<ReturnType<typeof verifyAdminResetToken>>, TError = ErrorType<unknown>>(params: VerifyAdminResetTokenParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof verifyAdminResetToken>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVerifyAdminResetTokenQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyAdminResetToken>>> = ({ signal }) => verifyAdminResetToken(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof verifyAdminResetToken>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type VerifyAdminResetTokenQueryResult = NonNullable<Awaited<ReturnType<typeof verifyAdminResetToken>>>
+export type VerifyAdminResetTokenQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Check whether a password reset token is still valid
+ */
+
+export function useVerifyAdminResetToken<TData = Awaited<ReturnType<typeof verifyAdminResetToken>>, TError = ErrorType<unknown>>(
+ params: VerifyAdminResetTokenParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof verifyAdminResetToken>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getVerifyAdminResetTokenQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getResetAdminPasswordUrl = () => {
+
+
+
+
+  return `/api/admin/password/reset`
+}
+
+/**
+ * @summary Set a new password using a reset token and sign in
+ */
+export const resetAdminPassword = async (adminResetPasswordInput: AdminResetPasswordInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAuthResponse> => {
+
+  return customFetch<AdminAuthResponse>(getResetAdminPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminResetPasswordInput)
+  }
+);}
+
+
+
+
+
+export const getResetAdminPasswordMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<AdminResetPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<AdminResetPasswordInput>}, TContext> => {
+
+const mutationKey = ['resetAdminPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetAdminPassword>>, {data: BodyType<AdminResetPasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  resetAdminPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetAdminPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetAdminPassword>>>
+    export type ResetAdminPasswordMutationBody = BodyType<AdminResetPasswordInput>
+    export type ResetAdminPasswordMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Set a new password using a reset token and sign in
+ */
+export const useResetAdminPassword = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<AdminResetPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resetAdminPassword>>,
+        TError,
+        {data: BodyType<AdminResetPasswordInput>},
+        TContext
+      > => {
+      return useMutation(getResetAdminPasswordMutationOptions(options));
+    }
+
+export const getChangeAdminPasswordUrl = () => {
+
+
+
+
+  return `/api/admin/password/change`
+}
+
+/**
+ * @summary Change the signed-in administrator's password
+ */
+export const changeAdminPassword = async (adminChangePasswordInput: AdminChangePasswordInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAuthResponse> => {
+
+  return customFetch<AdminAuthResponse>(getChangeAdminPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminChangePasswordInput)
+  }
+);}
+
+
+
+
+
+export const getChangeAdminPasswordMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeAdminPassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof changeAdminPassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext> => {
+
+const mutationKey = ['changeAdminPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeAdminPassword>>, {data: BodyType<AdminChangePasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  changeAdminPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChangeAdminPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof changeAdminPassword>>>
+    export type ChangeAdminPasswordMutationBody = BodyType<AdminChangePasswordInput>
+    export type ChangeAdminPasswordMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Change the signed-in administrator's password
+ */
+export const useChangeAdminPassword = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeAdminPassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof changeAdminPassword>>,
+        TError,
+        {data: BodyType<AdminChangePasswordInput>},
+        TContext
+      > => {
+      return useMutation(getChangeAdminPasswordMutationOptions(options));
+    }
+
+export const getUpdateAdminAccountUrl = () => {
+
+
+
+
+  return `/api/admin/account`
+}
+
+/**
+ * @summary Update the signed-in administrator's recovery email
+ */
+export const updateAdminAccount = async (adminAccountInput: AdminAccountInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAuthResponse> => {
+
+  return customFetch<AdminAuthResponse>(getUpdateAdminAccountUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminAccountInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdminAccountMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAccount>>, TError,{data: BodyType<AdminAccountInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminAccount>>, TError,{data: BodyType<AdminAccountInput>}, TContext> => {
+
+const mutationKey = ['updateAdminAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminAccount>>, {data: BodyType<AdminAccountInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateAdminAccount(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminAccountMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminAccount>>>
+    export type UpdateAdminAccountMutationBody = BodyType<AdminAccountInput>
+    export type UpdateAdminAccountMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update the signed-in administrator's recovery email
+ */
+export const useUpdateAdminAccount = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAccount>>, TError,{data: BodyType<AdminAccountInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminAccount>>,
+        TError,
+        {data: BodyType<AdminAccountInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminAccountMutationOptions(options));
     }
 
 export const getGetAdminOverviewUrl = () => {

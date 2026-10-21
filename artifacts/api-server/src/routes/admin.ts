@@ -1,9 +1,11 @@
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import { pool } from "@workspace/db";
 import {
   AdminLoginBody,
   AdminLoginResponse,
+  ChangeAdminPasswordBody,
+  ChangeAdminPasswordResponse,
   CreateAdminResourceBody,
   CreateAdminResourceParams,
   CreateAdminResourceResponse,
@@ -13,13 +15,23 @@ import {
   ListAdminResourceParams,
   ListAdminResourceQueryParams,
   ListAdminResourceResponse,
+  RequestAdminPasswordResetBody,
+  RequestAdminPasswordResetResponse,
+  ResetAdminPasswordBody,
+  ResetAdminPasswordResponse,
   SetupAdminBody,
   SetupAdminResponse,
+  UpdateAdminAccountBody,
+  UpdateAdminAccountResponse,
   UpdateAdminResourceBody,
   UpdateAdminResourceParams,
   UpdateAdminResourceResponse,
+  VerifyAdminResetTokenQueryParams,
+  VerifyAdminResetTokenResponse,
 } from "@workspace/api-zod";
 import { ObjectStorageService } from "../lib/objectStorage";
+import { logger } from "../lib/logger";
+import { sendMail } from "../lib/mailer";
 
 type FieldType = "text" | "textarea" | "url" | "number" | "boolean" | "date" | "json";
 type Field = { name: string; label: string; type: FieldType; required?: boolean; editable?: boolean };
@@ -71,27 +83,53 @@ const secret = () => {
   return process.env.SESSION_SECRET;
 };
 const sign = (value: string) => createHmac("sha256", secret()).update(value).digest("base64url");
-const makeToken = (id: number) => {
-  const payload = `${id}.${Date.now() + 7 * 86400000}`;
-  return `${payload}.${sign(payload)}`;
+type AdminRow = Admin & { password_hash: string };
+const adminColumns = "id, username, email, role, password_hash";
+const publicAdmin = ({ password_hash: _hash, ...admin }: AdminRow): Admin => admin;
+// The signature covers the password hash, so changing or resetting a password signs out every other session.
+const makeToken = (admin: AdminRow) => {
+  const payload = `${admin.id}.${Date.now() + 7 * 86400000}`;
+  return `${payload}.${sign(`${payload}.${admin.password_hash}`)}`;
 };
 const readAdmin = async (req: Request): Promise<Admin | null> => {
   const token = req.cookies?.[cookieName] as string | undefined;
   if (!token) return null;
   const [id, expires, signature] = token.split(".");
-  if (!id || !expires || !signature || Number(expires) < Date.now()) return null;
-  const expected = sign(`${id}.${expires}`);
+  if (!id || !expires || !signature || !Number.isInteger(Number(id)) || Number(expires) < Date.now()) return null;
+  const result = await pool.query<AdminRow>(`SELECT ${adminColumns} FROM admin_users WHERE id = $1`, [Number(id)]);
+  const admin = result.rows[0];
+  if (!admin) return null;
+  const expected = sign(`${id}.${expires}.${admin.password_hash}`);
   if (signature.length !== expected.length || !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
-  const result = await pool.query<Admin>("SELECT id, username, email, role FROM admin_users WHERE id = $1", [Number(id)]);
-  return result.rows[0] ?? null;
+  return publicAdmin(admin);
 };
 export const requireAdmin = async (req: Request, res: Response) => {
   const admin = await readAdmin(req);
   if (!admin) res.status(401).json({ error: "Authentication required" });
   return admin;
 };
-const setSession = (res: Response, id: number) =>
-  res.cookie(cookieName, makeToken(id), { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 7 * 86400000, path: "/" });
+const setSession = (res: Response, admin: AdminRow) =>
+  res.cookie(cookieName, makeToken(admin), { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 7 * 86400000, path: "/" });
+const isProduction = () => process.env.NODE_ENV === "production";
+/** The admin/admin test account is seeded outside production, or anywhere ADMIN_TEST_LOGIN=true. ADMIN_TEST_LOGIN=false turns it off. */
+export const testLoginEnabled = () =>
+  process.env.ADMIN_TEST_LOGIN === "true" || (!isProduction() && process.env.ADMIN_TEST_LOGIN !== "false");
+const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
+const resetTtlMinutes = 30;
+const resetRequests = new Map<string, number[]>();
+// In-memory sliding window: at most 5 reset requests per client per 15 minutes.
+const resetThrottled = (key: string) => {
+  const now = Date.now();
+  const recent = (resetRequests.get(key) ?? []).filter((at) => now - at < 15 * 60000);
+  recent.push(now);
+  resetRequests.set(key, recent);
+  return recent.length > 5;
+};
+// ADMIN_APP_URL pins the link origin in production so a forged Origin header cannot redirect reset emails.
+const appUrl = (req: Request) =>
+  (process.env.ADMIN_APP_URL ?? req.get("origin") ?? `${req.protocol}://${req.get("host")}`).replace(/\/+$/, "");
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const hashPassword = (password: string) => {
   const salt = randomBytes(16).toString("hex");
   return `scrypt$${salt}$${scryptSync(password, salt, 64).toString("hex")}`;
@@ -156,31 +194,160 @@ const cleanupUnreferencedProductImage = async (req: Request, imagePath: unknown)
   }
 };
 
+/** Creates the password-reset table and, when enabled, the admin/admin test account. Runs once at startup. */
+export async function ensureAdminAuth() {
+  await pool.query(`CREATE TABLE IF NOT EXISTS admin_password_resets (
+    id serial PRIMARY KEY,
+    admin_id integer NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+    token_hash text NOT NULL UNIQUE,
+    expires_at timestamptz NOT NULL,
+    used_at timestamptz,
+    requested_ip text,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )`);
+  if (!testLoginEnabled()) return;
+  const existing = await pool.query<AdminRow>(`SELECT ${adminColumns} FROM admin_users WHERE username = 'admin'`);
+  const current = existing.rows[0];
+  // Only rewrite the hash when it no longer matches, so restarts keep existing test sessions valid.
+  if (!current) {
+    await pool.query("INSERT INTO admin_users (username, password_hash, role) VALUES ('admin', $1, 'admin')", [hashPassword("admin")]);
+  } else if (!verifyPassword("admin", current.password_hash) || current.role !== "admin") {
+    await pool.query("UPDATE admin_users SET password_hash = $1, role = 'admin', updated_at = now() WHERE id = $2", [hashPassword("admin"), current.id]);
+  }
+  logger.warn("Admin test login enabled: username 'admin', password 'admin'. Set ADMIN_TEST_LOGIN=false to disable.");
+}
+
 router.get("/admin/session", async (req, res): Promise<void> => {
   const admin = await readAdmin(req);
-  res.json(GetAdminSessionResponse.parse({ authenticated: Boolean(admin), admin }));
+  const count = await pool.query<{ count: number }>("SELECT COUNT(*)::int AS count FROM admin_users");
+  res.json(GetAdminSessionResponse.parse({
+    authenticated: Boolean(admin),
+    admin,
+    setupAvailable: count.rows[0].count === 0,
+    testLoginEnabled: testLoginEnabled(),
+  }));
 });
 router.post("/admin/setup", async (req, res): Promise<void> => {
   const body = SetupAdminBody.safeParse(req.body);
   if (!body.success) { res.status(400).json({ error: body.error.message }); return; }
   const count = await pool.query("SELECT COUNT(*)::int AS count FROM admin_users");
   if (count.rows[0].count > 0) { res.status(409).json({ error: "Administrator setup is already complete" }); return; }
-  const result = await pool.query<Admin>("INSERT INTO admin_users (username, password_hash, email, role) VALUES ($1,$2,$3,'admin') RETURNING id, username, email, role", [body.data.username, hashPassword(body.data.password), body.data.email ?? null]);
-  setSession(res, result.rows[0].id);
-  res.status(201).json(SetupAdminResponse.parse({ admin: result.rows[0] }));
+  const result = await pool.query<AdminRow>(`INSERT INTO admin_users (username, password_hash, email, role) VALUES ($1,$2,$3,'admin') RETURNING ${adminColumns}`, [body.data.username, hashPassword(body.data.password), body.data.email ?? null]);
+  setSession(res, result.rows[0]);
+  res.status(201).json(SetupAdminResponse.parse({ admin: publicAdmin(result.rows[0]) }));
 });
 router.post("/admin/login", async (req, res): Promise<void> => {
   const body = AdminLoginBody.safeParse(req.body);
   if (!body.success) { res.status(400).json({ error: body.error.message }); return; }
-  const result = await pool.query<Admin & { password_hash: string }>("SELECT id, username, email, role, password_hash FROM admin_users WHERE username = $1", [body.data.username]);
+  const result = await pool.query<AdminRow>(`SELECT ${adminColumns} FROM admin_users WHERE username = $1`, [body.data.username]);
   const admin = result.rows[0];
   if (!admin || !verifyPassword(body.data.password, admin.password_hash)) { res.status(401).json({ error: "Invalid username or password" }); return; }
-  setSession(res, admin.id);
-  res.json(AdminLoginResponse.parse({ admin }));
+  setSession(res, admin);
+  res.json(AdminLoginResponse.parse({ admin: publicAdmin(admin) }));
 });
 router.post("/admin/logout", (_req, res): void => {
   res.clearCookie(cookieName, { path: "/" });
   res.sendStatus(204);
+});
+router.post("/admin/password/forgot", async (req, res): Promise<void> => {
+  const body = RequestAdminPasswordResetBody.safeParse(req.body);
+  if (!body.success) { res.status(400).json({ error: "Enter your username or recovery email" }); return; }
+  if (resetThrottled(req.ip ?? "unknown")) { res.status(429).json({ error: "Too many reset requests. Try again in 15 minutes." }); return; }
+  const identifier = body.data.identifier.trim();
+  const result = await pool.query<AdminRow>(
+    `SELECT ${adminColumns} FROM admin_users WHERE username = $1 OR lower(email) = lower($1) ORDER BY (username = $1) DESC LIMIT 1`,
+    [identifier],
+  );
+  const admin = result.rows[0];
+  let devResetUrl: string | null = null;
+  if (admin) {
+    const token = randomBytes(32).toString("base64url");
+    await pool.query("UPDATE admin_password_resets SET used_at = now() WHERE admin_id = $1 AND used_at IS NULL", [admin.id]);
+    await pool.query(
+      `INSERT INTO admin_password_resets (admin_id, token_hash, expires_at, requested_ip) VALUES ($1, $2, now() + interval '${resetTtlMinutes} minutes', $3)`,
+      [admin.id, hashToken(token), req.ip ?? null],
+    );
+    const resetUrl = `${appUrl(req)}/admin/reset-password?token=${token}`;
+    let emailed = false;
+    if (admin.email) {
+      try {
+        emailed = await sendMail({
+          to: admin.email,
+          subject: "Reset your ASP Aero Tech admin password",
+          text: `Hi ${admin.username},\n\nUse this link to choose a new admin password. It expires in ${resetTtlMinutes} minutes and works once:\n\n${resetUrl}\n\nIf you did not request this, you can ignore this email; your password will not change.`,
+          html: `<p>Hi ${escapeHtml(admin.username)},</p><p>Use the button below to choose a new admin password. It expires in ${resetTtlMinutes} minutes and works once.</p><p><a href="${resetUrl}" style="display:inline-block;padding:12px 20px;background:#0B203D;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">Reset password</a></p><p style="color:#64748b;font-size:13px">If you did not request this, you can ignore this email; your password will not change.</p>`,
+        });
+      } catch (error) {
+        req.log.error({ err: error }, "Failed to send password reset email");
+      }
+    }
+    if (!emailed) req.log.warn({ adminId: admin.id, hasEmail: Boolean(admin.email) }, "Password reset email not sent: no recovery email or SMTP is not configured");
+    if (!isProduction()) {
+      devResetUrl = resetUrl;
+      req.log.info({ resetUrl }, "Password reset link (development only)");
+    }
+  }
+  res.status(202).json(RequestAdminPasswordResetResponse.parse({
+    message: `If an administrator matches that username or email, a reset link is on its way. It expires in ${resetTtlMinutes} minutes.`,
+    devResetUrl,
+  }));
+});
+router.get("/admin/password/reset", async (req, res): Promise<void> => {
+  const query = VerifyAdminResetTokenQueryParams.safeParse(req.query);
+  if (!query.success) { res.json(VerifyAdminResetTokenResponse.parse({ valid: false, username: null, expiresAt: null })); return; }
+  const result = await pool.query<{ username: string; expires_at: Date }>(
+    `SELECT u.username, r.expires_at FROM admin_password_resets r JOIN admin_users u ON u.id = r.admin_id
+     WHERE r.token_hash = $1 AND r.used_at IS NULL AND r.expires_at > now()`,
+    [hashToken(query.data.token)],
+  );
+  const row = result.rows[0];
+  res.json(VerifyAdminResetTokenResponse.parse({ valid: Boolean(row), username: row?.username ?? null, expiresAt: row?.expires_at ?? null }));
+});
+router.post("/admin/password/reset", async (req, res): Promise<void> => {
+  const body = ResetAdminPasswordBody.safeParse(req.body);
+  if (!body.success) { res.status(400).json({ error: "Choose a password with at least 8 characters" }); return; }
+  // Consuming the token in the same statement that checks it makes each link single-use, even under concurrent requests.
+  const consumed = await pool.query<{ admin_id: number }>(
+    "UPDATE admin_password_resets SET used_at = now() WHERE token_hash = $1 AND used_at IS NULL AND expires_at > now() RETURNING admin_id",
+    [hashToken(body.data.token)],
+  );
+  const adminId = consumed.rows[0]?.admin_id;
+  if (!adminId) { res.status(400).json({ error: "This reset link is invalid or has expired. Request a new one." }); return; }
+  const updated = await pool.query<AdminRow>(
+    `UPDATE admin_users SET password_hash = $1, updated_at = now() WHERE id = $2 RETURNING ${adminColumns}`,
+    [hashPassword(body.data.password), adminId],
+  );
+  await pool.query("UPDATE admin_password_resets SET used_at = now() WHERE admin_id = $1 AND used_at IS NULL", [adminId]);
+  setSession(res, updated.rows[0]);
+  req.log.info({ adminId }, "Admin password reset");
+  res.json(ResetAdminPasswordResponse.parse({ admin: publicAdmin(updated.rows[0]) }));
+});
+router.post("/admin/password/change", async (req, res): Promise<void> => {
+  const admin = await requireAdmin(req, res);
+  if (!admin) return;
+  const body = ChangeAdminPasswordBody.safeParse(req.body);
+  if (!body.success) { res.status(400).json({ error: "Choose a new password with at least 8 characters" }); return; }
+  const current = await pool.query<AdminRow>(`SELECT ${adminColumns} FROM admin_users WHERE id = $1`, [admin.id]);
+  if (!current.rows[0] || !verifyPassword(body.data.currentPassword, current.rows[0].password_hash)) {
+    res.status(400).json({ error: "Your current password is incorrect" }); return;
+  }
+  if (body.data.currentPassword === body.data.newPassword) { res.status(400).json({ error: "The new password must be different from the current one" }); return; }
+  const updated = await pool.query<AdminRow>(
+    `UPDATE admin_users SET password_hash = $1, updated_at = now() WHERE id = $2 RETURNING ${adminColumns}`,
+    [hashPassword(body.data.newPassword), admin.id],
+  );
+  await pool.query("UPDATE admin_password_resets SET used_at = now() WHERE admin_id = $1 AND used_at IS NULL", [admin.id]);
+  setSession(res, updated.rows[0]);
+  res.json(ChangeAdminPasswordResponse.parse({ admin: publicAdmin(updated.rows[0]) }));
+});
+router.patch("/admin/account", async (req, res): Promise<void> => {
+  const admin = await requireAdmin(req, res);
+  if (!admin) return;
+  const body = UpdateAdminAccountBody.safeParse(req.body);
+  const email = body.success ? body.data.email?.trim() || null : undefined;
+  if (email === undefined || (email && !emailPattern.test(email))) { res.status(400).json({ error: "Enter a valid email address" }); return; }
+  const updated = await pool.query<Admin>("UPDATE admin_users SET email = $1, updated_at = now() WHERE id = $2 RETURNING id, username, email, role", [email, admin.id]);
+  res.json(UpdateAdminAccountResponse.parse({ admin: updated.rows[0] }));
 });
 router.get("/admin/overview", async (req, res): Promise<void> => {
   if (!(await requireAdmin(req, res))) return;

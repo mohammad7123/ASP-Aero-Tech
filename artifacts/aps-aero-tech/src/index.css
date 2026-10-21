@@ -82,6 +82,79 @@
   --radius: 0.5rem;
 }
 
+/* Admin console palette. Scoped to html.admin-ui (set by AdminThemeProvider) so the public site keeps its own look. */
+html.admin-ui {
+  --background: 216 33% 97%;
+  --foreground: 218 54% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 218 54% 13%;
+  --card-border: 216 24% 89%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 218 54% 13%;
+  --popover-border: 216 24% 89%;
+  --primary: 215 70% 18%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 27 92% 54%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 216 28% 94%;
+  --muted-foreground: 217 16% 42%;
+  --accent: 115 89% 28%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 216 24% 88%;
+  --input: 216 24% 84%;
+  --ring: 27 92% 54%;
+  --radius: 0.75rem;
+  --admin-glow: 27 92% 54%;
+  color-scheme: light;
+}
+
+html.admin-ui.dark {
+  --background: 222 47% 5%;
+  --foreground: 213 45% 94%;
+  --card: 222 40% 8.5%;
+  --card-foreground: 213 45% 94%;
+  --card-border: 220 30% 16%;
+  --popover: 222 40% 10%;
+  --popover-foreground: 213 45% 94%;
+  --popover-border: 220 30% 18%;
+  --primary: 211 92% 68%;
+  --primary-foreground: 222 47% 7%;
+  --secondary: 27 95% 58%;
+  --secondary-foreground: 222 47% 7%;
+  --muted: 221 32% 13%;
+  --muted-foreground: 216 20% 66%;
+  --accent: 122 55% 45%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 75% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 30% 16%;
+  --input: 220 28% 22%;
+  --ring: 27 95% 58%;
+  --admin-glow: 211 92% 68%;
+  color-scheme: dark;
+}
+
+/* Circular reveal used by the admin theme toggle (View Transitions API). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+.admin-grid-bg {
+  background-image:
+    linear-gradient(hsl(var(--foreground) / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--foreground) / 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.admin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
 @layer base {
   * {
     @apply border-border;

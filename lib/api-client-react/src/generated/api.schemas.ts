@@ -382,6 +382,54 @@ export interface AdminSession {
   authenticated: boolean;
   /** @nullable */
   admin: AdminUser | null;
+  /** True while no administrator exists, so the first-run setup can be shown */
+  setupAvailable: boolean;
+  /** True when the admin/admin test account is seeded (non-production only) */
+  testLoginEnabled: boolean;
+}
+
+export interface AdminForgotPasswordInput {
+  /**
+     * Username or recovery email
+     * @minLength 1
+     */
+  identifier: string;
+}
+
+export interface AdminForgotPasswordResponse {
+  message: string;
+  /**
+     * Only returned outside production, so the flow can be tested without email
+     * @nullable
+     */
+  devResetUrl: string | null;
+}
+
+export interface AdminResetTokenStatus {
+  valid: boolean;
+  /** @nullable */
+  username: string | null;
+  /** @nullable */
+  expiresAt: string | null;
+}
+
+export interface AdminResetPasswordInput {
+  /** @minLength 1 */
+  token: string;
+  /** @minLength 8 */
+  password: string;
+}
+
+export interface AdminChangePasswordInput {
+  /** @minLength 1 */
+  currentPassword: string;
+  /** @minLength 8 */
+  newPassword: string;
+}
+
+export interface AdminAccountInput {
+  /** @nullable */
+  email: string | null;
 }
 
 export interface AdminSetupInput {
@@ -443,6 +491,10 @@ export interface AdminResourceMutationResponse {
   resource: string;
   row: AdminResourceRow;
 }
+
+export type VerifyAdminResetTokenParams = {
+token: string;
+};
 
 export type ListAdminResourceParams = {
 search?: string;
