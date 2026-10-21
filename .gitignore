@@ -47,3 +47,5 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+.env
+ecosystem.asp-aero.config.js
