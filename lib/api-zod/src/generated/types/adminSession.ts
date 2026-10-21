@@ -11,4 +11,8 @@ export interface AdminSession {
   authenticated: boolean;
   /** @nullable */
   admin: AdminUser | null;
+  /** True while no administrator exists, so the first-run setup can be shown */
+  setupAvailable: boolean;
+  /** True when the admin/admin test account is seeded (non-production only) */
+  testLoginEnabled: boolean;
 }

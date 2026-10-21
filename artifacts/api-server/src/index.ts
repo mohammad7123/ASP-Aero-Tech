@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { ensureProductCatalog } from "./lib/productCatalogSeed";
+import { ensureAdminAuth } from "./routes/admin";
 
 const rawPort = process.env["PORT"];
 
@@ -18,6 +19,7 @@ if (Number.isNaN(port) || port <= 0) {
 
 async function start() {
   await ensureProductCatalog();
+  await ensureAdminAuth();
   app.listen(port, (err) => {
     if (err) {
       logger.error({ err }, "Error listening on port");

@@ -586,7 +586,9 @@ export const GetAdminSessionResponse = zod.object({
   "username": zod.string(),
   "email": zod.string().nullable(),
   "role": zod.string()
-}).nullable()
+}).nullable(),
+  "setupAvailable": zod.boolean().describe('True while no administrator exists, so the first-run setup can be shown'),
+  "testLoginEnabled": zod.boolean().describe('True when the admin\/admin test account is seeded (non-production only)')
 })
 
 
@@ -642,6 +644,99 @@ export const AdminLoginResponse = zod.object({
  * @summary Sign out of the admin panel
  */
 export const AdminLogoutResponse = zod.void()
+
+
+/**
+ * @summary Send a password reset link to an administrator
+ */
+
+
+
+export const RequestAdminPasswordResetBody = zod.object({
+  "identifier": zod.string().min(1).describe('Username or recovery email')
+})
+
+export const RequestAdminPasswordResetResponse = zod.object({
+  "message": zod.string(),
+  "devResetUrl": zod.string().nullable().describe('Only returned outside production, so the flow can be tested without email')
+})
+
+
+/**
+ * @summary Check whether a password reset token is still valid
+ */
+export const VerifyAdminResetTokenQueryParams = zod.object({
+  "token": zod.coerce.string()
+})
+
+export const VerifyAdminResetTokenResponse = zod.object({
+  "valid": zod.boolean(),
+  "username": zod.string().nullable(),
+  "expiresAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Set a new password using a reset token and sign in
+ */
+
+export const resetAdminPasswordBodyPasswordMin = 8;
+
+
+
+export const ResetAdminPasswordBody = zod.object({
+  "token": zod.string().min(1),
+  "password": zod.string().min(resetAdminPasswordBodyPasswordMin)
+})
+
+export const ResetAdminPasswordResponse = zod.object({
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+})
+})
+
+
+/**
+ * @summary Change the signed-in administrator's password
+ */
+
+export const changeAdminPasswordBodyNewPasswordMin = 8;
+
+
+
+export const ChangeAdminPasswordBody = zod.object({
+  "currentPassword": zod.string().min(1),
+  "newPassword": zod.string().min(changeAdminPasswordBodyNewPasswordMin)
+})
+
+export const ChangeAdminPasswordResponse = zod.object({
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+})
+})
+
+
+/**
+ * @summary Update the signed-in administrator's recovery email
+ */
+export const UpdateAdminAccountBody = zod.object({
+  "email": zod.string().nullable()
+})
+
+export const UpdateAdminAccountResponse = zod.object({
+  "admin": zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string().nullable(),
+  "role": zod.string()
+})
+})
 
 
 /**

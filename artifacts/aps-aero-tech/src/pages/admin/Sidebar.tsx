@@ -1,6 +1,10 @@
+import { useLayoutEffect, useRef, type ComponentType } from "react"
 import { Link, useLocation } from "wouter"
-import { LayoutDashboard, Users, MessageSquare, Briefcase, FileText, Image, Settings, Layers, Box, Factory, Mail, Menu, Newspaper, Target, Megaphone } from "lucide-react"
-import { cn } from "@/components/ui/button"
+import { motion } from "framer-motion"
+import gsap from "gsap"
+import { LayoutDashboard, Users, Briefcase, FileText, Image, Settings, Layers, Box, Factory, Mail, Menu, Newspaper, Megaphone } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { BrandLogo, prefersReducedMotion } from "./theme"
 
 export const ADMIN_RESOURCES = [
   { id: "inquiries", label: "Inquiries", icon: Mail },
@@ -20,85 +24,122 @@ export const ADMIN_RESOURCES = [
   { id: "media", label: "Media Library", icon: Image },
 ]
 
-export function Sidebar() {
+export const ADMIN_PAGES = [
+  { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/marketing", label: "Marketing Hub", icon: Megaphone },
+  { href: "/admin/settings", label: "System Settings", icon: Settings },
+]
+
+/** Human title for the current admin route, used by the header and document title. */
+export function adminPageTitle(location: string) {
+  const page = ADMIN_PAGES.find((p) => p.href === location || (p.href !== "/admin" && location.startsWith(p.href)))
+  if (page) return page.label
+  const resource = ADMIN_RESOURCES.find((r) => location === `/admin/resources/${r.id}`)
+  return resource?.label ?? "Admin"
+}
+
+function NavItem({ href, label, icon: Icon, active, layoutGroup, onNavigate }: {
+  href: string
+  label: string
+  icon: ComponentType<{ className?: string }>
+  active: boolean
+  layoutGroup: string
+  onNavigate?: () => void
+}) {
+  return (
+    <Link href={href} onClick={onNavigate} data-nav-item className="block">
+      <span
+        className={cn(
+          "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+          active ? "text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        )}
+      >
+        {active && (
+          <motion.span
+            layoutId={`${layoutGroup}-active`}
+            className="absolute inset-0 rounded-lg bg-secondary/12 ring-1 ring-secondary/25"
+            transition={{ type: "spring", stiffness: 500, damping: 38 }}
+          >
+            <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-secondary" />
+          </motion.span>
+        )}
+        <Icon className={cn("relative h-4 w-4 transition-colors", active ? "text-secondary" : "group-hover:text-secondary")} />
+        <span className="relative">{label}</span>
+      </span>
+    </Link>
+  )
+}
+
+export function SidebarContent({ layoutGroup = "sidebar", onNavigate }: { layoutGroup?: string; onNavigate?: () => void }) {
   const [location] = useLocation()
+  const list = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (!list.current || prefersReducedMotion()) return
+    const ctx = gsap.context(() => {
+      gsap.from("[data-nav-heading], [data-nav-item]", { x: -14, opacity: 0, duration: 0.45, ease: "power3.out", stagger: 0.025, clearProps: "all" })
+    }, list)
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <aside className="w-64 border-r border-border bg-card shrink-0 flex flex-col h-screen overflow-hidden hidden md:flex relative">
-      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-primary/50 to-transparent pointer-events-none" />
-      
-      <div className="h-20 border-b border-border flex items-center px-6 shrink-0 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5" />
-        <Link href="/" className="relative z-10 flex items-center h-full">
-          <img src="/asp-logo.png" alt="ASP Aero Tech" className="h-10 w-auto object-contain hover:opacity-80 transition-opacity" />
+    <div className="flex h-full flex-col">
+      <div className="flex h-[72px] shrink-0 items-center border-b border-border px-5">
+        <Link href="/" onClick={onNavigate} className="flex h-10 items-center transition-opacity hover:opacity-80" aria-label="Open public website">
+          <BrandLogo className="h-10" />
         </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8 scrollbar-thin">
+      <div ref={list} className="admin-scroll flex-1 space-y-7 overflow-y-auto px-3 py-5">
         <div>
-          <div className="px-2 mb-3 text-xs font-mono text-muted-foreground uppercase tracking-wider font-bold">
-            Telemetry
+          <p data-nav-heading className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/80">Dashboard</p>
+          <div className="space-y-0.5">
+            {ADMIN_PAGES.map((page) => (
+              <NavItem
+                key={page.href}
+                {...page}
+                layoutGroup={layoutGroup}
+                onNavigate={onNavigate}
+                active={page.href === "/admin" ? location === "/admin" : location.startsWith(page.href)}
+              />
+            ))}
           </div>
-          <Link href="/admin">
-            <span className={cn(
-              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
-              location === "/admin" 
-                ? "bg-primary/20 text-primary border border-primary/30" 
-                : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
-            )}>
-              <LayoutDashboard className={cn("w-4 h-4", location === "/admin" ? "text-primary" : "group-hover:text-primary")} />
-              Overview
-            </span>
-          </Link>
-          <Link href="/admin/marketing">
-            <span className={cn(
-              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
-              location.startsWith("/admin/marketing")
-                ? "bg-primary/20 text-primary border border-primary/30"
-                : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
-            )}>
-              <Megaphone className={cn("w-4 h-4", location.startsWith("/admin/marketing") ? "text-primary" : "group-hover:text-primary")} />
-              Marketing Hub
-            </span>
-          </Link>
-          <Link href="/admin/settings">
-            <span className={cn(
-              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
-              location.startsWith("/admin/settings")
-                ? "bg-primary/20 text-primary border border-primary/30"
-                : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
-            )}>
-              <Settings className={cn("w-4 h-4", location.startsWith("/admin/settings") ? "text-primary" : "group-hover:text-primary")} />
-              System Settings
-            </span>
-          </Link>
         </div>
 
         <div>
-          <div className="px-2 mb-3 text-xs font-mono text-muted-foreground uppercase tracking-wider font-bold">
-            Data Modules
-          </div>
-          <div className="space-y-1">
-            {ADMIN_RESOURCES.map(res => {
-              const isActive = location === `/admin/resources/${res.id}`
-              const Icon = res.icon
-              return (
-                <Link key={res.id} href={`/admin/resources/${res.id}`}>
-                  <span className={cn(
-                    "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors cursor-pointer group clip-edges",
-                    isActive 
-                      ? "bg-primary/20 text-primary border border-primary/30" 
-                      : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
-                  )}>
-                    <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "group-hover:text-primary")} />
-                    {res.label}
-                  </span>
-                </Link>
-              )
-            })}
+          <p data-nav-heading className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/80">Content</p>
+          <div className="space-y-0.5">
+            {ADMIN_RESOURCES.map((res) => (
+              <NavItem
+                key={res.id}
+                href={`/admin/resources/${res.id}`}
+                label={res.label}
+                icon={res.icon}
+                layoutGroup={layoutGroup}
+                onNavigate={onNavigate}
+                active={location === `/admin/resources/${res.id}`}
+              />
+            ))}
           </div>
         </div>
       </div>
+
+      <div className="shrink-0 border-t border-border p-4">
+        <div className="flex h-1 overflow-hidden rounded-full" aria-hidden="true">
+          <span className="flex-1 bg-secondary" />
+          <span className="flex-1 bg-white ring-1 ring-inset ring-border" />
+          <span className="flex-1 bg-accent" />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">ASP Aertech Pvt. Ltd. · Admin</p>
+      </div>
+    </div>
+  )
+}
+
+export function Sidebar() {
+  return (
+    <aside className="relative hidden h-screen w-64 shrink-0 border-r border-border bg-card md:block">
+      <SidebarContent />
     </aside>
   )
 }

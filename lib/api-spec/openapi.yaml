@@ -361,6 +361,137 @@ paths:
       responses:
         "204":
           description: Signed out
+  /admin/password/forgot:
+    post:
+      operationId: requestAdminPasswordReset
+      tags: [admin]
+      summary: Send a password reset link to an administrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminForgotPasswordInput"
+      responses:
+        "202":
+          description: Reset request accepted (the response is identical whether or not the account exists)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminForgotPasswordResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many reset requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/password/reset:
+    get:
+      operationId: verifyAdminResetToken
+      tags: [admin]
+      summary: Check whether a password reset token is still valid
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminResetTokenStatus"
+    post:
+      operationId: resetAdminPassword
+      tags: [admin]
+      summary: Set a new password using a reset token and sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminResetPasswordInput"
+      responses:
+        "200":
+          description: Password updated and administrator signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthResponse"
+        "400":
+          description: Invalid or expired token, or weak password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/password/change:
+    post:
+      operationId: changeAdminPassword
+      tags: [admin]
+      summary: Change the signed-in administrator's password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminChangePasswordInput"
+      responses:
+        "200":
+          description: Password changed; other sessions are signed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthResponse"
+        "400":
+          description: Current password is wrong or the new password is too weak
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/account:
+    patch:
+      operationId: updateAdminAccount
+      tags: [admin]
+      summary: Update the signed-in administrator's recovery email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminAccountInput"
+      responses:
+        "200":
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuthResponse"
+        "400":
+          description: Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/overview:
     get:
       operationId: getAdminOverview
@@ -950,7 +1081,67 @@ components:
         admin:
           type: ["object", "null"]
           $ref: "#/components/schemas/AdminUser"
-      required: [authenticated, admin]
+        setupAvailable:
+          type: boolean
+          description: True while no administrator exists, so the first-run setup can be shown
+        testLoginEnabled:
+          type: boolean
+          description: True when the admin/admin test account is seeded (non-production only)
+      required: [authenticated, admin, setupAvailable, testLoginEnabled]
+    AdminForgotPasswordInput:
+      type: object
+      properties:
+        identifier:
+          type: string
+          minLength: 1
+          description: Username or recovery email
+      required: [identifier]
+    AdminForgotPasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        devResetUrl:
+          type: ["string", "null"]
+          description: Only returned outside production, so the flow can be tested without email
+      required: [message, devResetUrl]
+    AdminResetTokenStatus:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        username:
+          type: ["string", "null"]
+        expiresAt:
+          type: ["string", "null"]
+          format: date-time
+      required: [valid, username, expiresAt]
+    AdminResetPasswordInput:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 8
+      required: [token, password]
+    AdminChangePasswordInput:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          minLength: 8
+      required: [currentPassword, newPassword]
+    AdminAccountInput:
+      type: object
+      properties:
+        email:
+          type: ["string", "null"]
+      required: [email]
     AdminSetupInput:
       type: object
       properties:

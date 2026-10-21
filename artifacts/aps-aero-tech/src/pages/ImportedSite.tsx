@@ -229,7 +229,11 @@ function LegacyLayout({ children }: { children: ReactNode }) {
       document.head.appendChild(script);
       const analyticsWindow = window as Window & { dataLayer?: unknown[][] };
       analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
-      const gtag = (...args: unknown[]) => analyticsWindow.dataLayer?.push(args);
+      // gtag.js expects the `arguments` object, not an array.
+      const gtag = function (this: unknown, ..._args: unknown[]) {
+        // eslint-disable-next-line prefer-rest-params
+        analyticsWindow.dataLayer?.push(arguments as unknown as unknown[]);
+      };
       gtag("js", new Date());
       gtag("config", id);
     };
