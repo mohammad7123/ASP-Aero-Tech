@@ -26,7 +26,7 @@ export function HeroSection() {
       {/* viewport HUD frame */}
       <div className="hud-corners pointer-events-none absolute inset-4 opacity-50 sm:inset-6 [--s:22px]" aria-hidden />
       {/* legibility scrim for the copy over the 3D scene */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgb(var(--scrim)/0.85)_0%,rgb(var(--scrim)/0.45)_45%,transparent_70%)] [mask-image:linear-gradient(to_bottom,#000_55%,transparent)]" aria-hidden />
+      <div className="hero-scrim pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_55%,transparent)]" aria-hidden />
       <HeroFallbackVisual />
 
       {/* phones: headline on top, drone in the clear middle, copy + CTAs below; from sm up it is one centred block */}
@@ -43,6 +43,7 @@ export function HeroSection() {
             text={heroContent.title}
             trigger="boot"
             accent={["mission."]}
+            accentClassName="accent-swoosh"
             className="mt-6 text-[2.75rem] font-semibold leading-[0.98] tracking-[-0.035em] text-fg sm:text-6xl lg:text-[5.4rem]"
           />
         </div>

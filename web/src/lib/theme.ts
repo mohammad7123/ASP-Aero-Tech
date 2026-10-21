@@ -35,4 +35,37 @@ export function setTheme(theme: Theme) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLOR[theme]);
 }
 
-export const toggleTheme = () => setTheme(read() === "light" ? "dark" : "light");
+type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => { ready: Promise<void> } };
+
+/**
+ * Switches theme with a circular reveal spreading from `origin` (the toggle
+ * button) where View Transitions are supported, and a short colour
+ * cross-fade elsewhere. Reduced-motion visitors get an instant switch.
+ */
+export function toggleTheme(origin?: { x: number; y: number }) {
+  const next: Theme = read() === "light" ? "dark" : "light";
+  const doc = document as ViewTransitionDocument;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) return setTheme(next);
+
+  if (!doc.startViewTransition) {
+    const root = document.documentElement;
+    root.classList.add("theme-fading");
+    setTheme(next);
+    window.setTimeout(() => root.classList.remove("theme-fading"), 500);
+    return;
+  }
+
+  const x = origin?.x ?? window.innerWidth - 48;
+  const y = origin?.y ?? 48;
+  const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+  const transition = doc.startViewTransition(() => setTheme(next));
+  transition.ready
+    .then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: "cubic-bezier(0.65, 0, 0.35, 1)", pseudoElement: "::view-transition-new(root)" },
+      );
+    })
+    .catch(() => undefined);
+}

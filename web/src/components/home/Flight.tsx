@@ -7,7 +7,7 @@ import { useTier } from "@/components/providers/DeviceTier";
 import { anatomyParts } from "@/content/highlights";
 import { anatomyLayer } from "@/lib/anatomy";
 import { flight, setWorldReady, subscribeWorldReady, type SegmentName } from "@/lib/flight";
-import { ScrollTrigger } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { clamp, cn } from "@/lib/utils";
 
 const WorldCanvas = dynamic(() => import("@/components/three/world/WorldCanvas"), { ssr: false });
@@ -112,9 +112,42 @@ export function WorldStage() {
       {webgl && (
         <div className={cn("absolute inset-0 transition-opacity duration-1000", ready ? "opacity-100" : "opacity-0")}>
           <WorldCanvas tier={tier} onReady={onReady} />
+          <DaylightAmbience />
           <AnatomyLabels />
         </div>
       )}
+      {!webgl && <DaylightAmbience />}
+    </div>
+  );
+}
+
+/**
+ * Bright-theme atmosphere over the world: sun glare, slowly turning light rays
+ * and drifting colour blooms. CSS-only (transform/opacity animations on the
+ * compositor) and hidden in the dark theme — see .daylight in globals.css.
+ */
+function DaylightAmbience() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Full glory in the hero; as the flight starts the sun and rays fade out and
+  // the colour blooms ease back to a light tint so the terrain reads clearly.
+  useGSAP(
+    () => {
+      const scrub = { trigger: document.documentElement, start: 0, end: () => window.innerHeight * 1.1, scrub: 0.6 };
+      gsap.to("[data-daylight-fade]", { opacity: 0, ease: "none", scrollTrigger: scrub });
+      gsap.to("[data-daylight-tint]", { opacity: 0.4, ease: "none", scrollTrigger: { ...scrub } });
+    },
+    { scope: ref },
+  );
+
+  return (
+    <div ref={ref} className="daylight absolute inset-0 overflow-hidden">
+      {/* each blended layer fades itself: an opacity wrapper would isolate the blend from the 3D scene */}
+      <div data-daylight-tint className="daylight-bloom daylight-bloom-a" />
+      <div data-daylight-tint className="daylight-bloom daylight-bloom-b" />
+      <div data-daylight-tint className="daylight-bloom daylight-bloom-c" />
+      <div data-daylight-fade className="daylight-rays" />
+      <div data-daylight-fade className="daylight-sun" />
     </div>
   );
 }

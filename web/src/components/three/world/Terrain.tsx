@@ -55,15 +55,17 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
   const [segX, segZ] = detail === "high" ? [110, 240] : [64, 140];
   const light = useTheme() === "light";
 
-  const geometry = useMemo(() => {
+  // Heights and both themes' vertex colours are computed once; switching theme
+  // only swaps the colour buffer, so the toggle never stalls on a mesh rebuild.
+  const { geometry, colors } = useMemo(() => {
     const W = 380;
     const D = 900;
     const g = new THREE.PlaneGeometry(W, D, segX, segZ);
     g.rotateX(-Math.PI / 2);
     g.translate(0, 0, -250);
-    const PALETTE = makePalette(light);
+    const palettes = { dark: makePalette(false), light: makePalette(true) };
     const pos = g.attributes.position as THREE.BufferAttribute;
-    const colors = new Float32Array(pos.count * 3);
+    const colors = { dark: new Float32Array(pos.count * 3), light: new Float32Array(pos.count * 3) };
     const c = new THREE.Color();
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
@@ -77,19 +79,29 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
       const river = Math.exp(-((x - rx) ** 2) / 18);
       const city = cityMask(x, z);
       const pad = 1 - sstep(10, 26, Math.hypot(x, z));
+      const field = Math.floor(hash2(Math.floor(x / 9), Math.floor(z / 9)) * palettes.light.fields.length);
 
-      if (pad > 0.5) c.copy(PALETTE.pad);
-      else if (city > 0.5) c.copy(PALETTE.asphalt);
-      else if (river > 0.55 && h < 0.5) c.copy(PALETTE.water);
-      else if (ad < 30 && h < 6) c.copy(PALETTE.fields[Math.floor(hash2(Math.floor(x / 9), Math.floor(z / 9)) * PALETTE.fields.length)]);
-      else if (h > 36) c.copy(PALETTE.rockHigh).lerp(PALETTE.snow, sstep(36, 48, h));
-      else c.copy(PALETTE.grass).lerp(PALETTE.rock, sstep(4, 26, h));
-      colors.set([c.r, c.g, c.b], i * 3);
+      for (const key of ["dark", "light"] as const) {
+        const PALETTE = palettes[key];
+        if (pad > 0.5) c.copy(PALETTE.pad);
+        else if (city > 0.5) c.copy(PALETTE.asphalt);
+        else if (river > 0.55 && h < 0.5) c.copy(PALETTE.water);
+        else if (ad < 30 && h < 6) c.copy(PALETTE.fields[field % PALETTE.fields.length]);
+        else if (h > 36) c.copy(PALETTE.rockHigh).lerp(PALETTE.snow, sstep(36, 48, h));
+        else c.copy(PALETTE.grass).lerp(PALETTE.rock, sstep(4, 26, h));
+        colors[key].set([c.r, c.g, c.b], i * 3);
+      }
     }
-    g.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+    g.setAttribute("aColor", new THREE.BufferAttribute(colors.dark.slice(), 3));
     g.computeBoundingSphere();
-    return g;
-  }, [segX, segZ, light]);
+    return { geometry: g, colors };
+  }, [segX, segZ]);
+
+  useEffect(() => {
+    const attr = geometry.getAttribute("aColor") as THREE.BufferAttribute;
+    (attr.array as Float32Array).set(light ? colors.light : colors.dark);
+    attr.needsUpdate = true;
+  }, [geometry, colors, light]);
 
   const material = useMemo(
     () =>

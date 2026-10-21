@@ -136,7 +136,8 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
   useLayoutEffect(() => {
     gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production";
     scene.environmentIntensity = worldTheme(light).env;
-    scene.fog = new THREE.Fog(worldTheme(light).fog, light ? 90 : 60, high ? 520 : 420);
+    // Daylight fog starts further out and ends later so colours stay saturated.
+    scene.fog = new THREE.Fog(worldTheme(light).fog, light ? 140 : 60, light ? (high ? 680 : 520) : high ? 520 : 420);
     return () => {
       scene.fog = null;
     };

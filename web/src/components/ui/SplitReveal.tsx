@@ -14,6 +14,8 @@ type Props = {
   trigger?: "boot" | "view";
   /** Words (exact match, punctuation included) rendered in the accent colour. */
   accent?: string[];
+  /** Extra classes for accent words (e.g. the hero's underline swoosh). */
+  accentClassName?: string;
   delay?: number;
 };
 
@@ -22,7 +24,7 @@ type Props = {
  * layout shift, readable without JS); the element carries an aria-label so
  * assistive tech reads the sentence, not individual letters.
  */
-export function SplitReveal({ text, as = "h2", className, trigger = "view", accent = [], delay = 0 }: Props) {
+export function SplitReveal({ text, as = "h2", className, trigger = "view", accent = [], accentClassName, delay = 0 }: Props) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export function SplitReveal({ text, as = "h2", className, trigger = "view", acce
       {!heading && <span className="sr-only">{text}</span>}
       {words.map((word, wi) => (
         <span key={wi} aria-hidden="true">
-          <span className={cn("reveal-word", accent.includes(word) && "text-cyan")}>
+          <span className={cn("reveal-word", accent.includes(word) && cn("text-cyan", accentClassName))}>
             {Array.from(word).map((ch, ci) => (
               <span key={ci} className="reveal-char">
                 {ch}
