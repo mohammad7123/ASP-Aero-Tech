@@ -17,7 +17,6 @@ export const ADMIN_RESOURCES = [
   { id: "portfolio", label: "Portfolio", icon: Image },
   { id: "clients", label: "Clients", icon: Users },
   { id: "jobs", label: "Jobs", icon: Briefcase },
-  { id: "applications", label: "Applications", icon: FileText },
   { id: "blog-categories", label: "Blog Categories", icon: Layers },
   { id: "blog-posts", label: "Blog Posts", icon: Newspaper },
   { id: "menu-items", label: "Menu Items", icon: Menu },
@@ -26,6 +25,7 @@ export const ADMIN_RESOURCES = [
 
 export const ADMIN_PAGES = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/applications", label: "Job Applications", icon: Users },
   { href: "/admin/marketing", label: "Marketing Hub", icon: Megaphone },
   { href: "/admin/settings", label: "System Settings", icon: Settings },
 ]

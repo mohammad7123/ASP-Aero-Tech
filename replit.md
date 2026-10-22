@@ -10,6 +10,8 @@ Public aerospace website and protected content-management console for ASP Aertec
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Optional API env: `CV_UPLOAD_DIR` (where job-application CVs are saved; default `./uploads/cv`, keep it outside the checkout on servers), `ADMIN_APP_URL` (origin used in password-reset links), `ADMIN_TEST_LOGIN` (`true` seeds admin/admin; on by default outside production)
+- Reverse proxy: allow request bodies of at least 8 MB on the site (`client_max_body_size 10m;` in nginx) so CV uploads aren't rejected
 
 ## Stack
 

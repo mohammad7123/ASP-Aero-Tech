@@ -49,3 +49,6 @@ Thumbs.db
 .local/
 .env
 ecosystem.asp-aero.config.js
+
+# Uploaded CVs (artifacts/api-server careers route) when CV_UPLOAD_DIR is not set
+uploads/

@@ -89,7 +89,7 @@ export default async function CareersPage() {
                         <MapPin size={15} className="text-cyan" /> {job.location}
                       </p>
                       {job.salaryRange && <p className="mt-2 text-sm text-fg">{job.salaryRange}</p>}
-                      <TLink href={`/contact?role=${encodeURIComponent(job.title)}`} className="btn btn-primary mt-5 min-h-0 px-5 py-2.5 text-sm">
+                      <TLink href={`/careers/apply/${job.id}`} className="btn btn-primary mt-5 min-h-0 px-5 py-2.5 text-sm">
                         Apply for this role <ArrowUpRight size={15} />
                       </TLink>
                     </div>

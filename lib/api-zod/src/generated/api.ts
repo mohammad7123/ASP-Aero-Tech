@@ -540,6 +540,72 @@ export const ListOpenJobsResponse = zod.array(ListOpenJobsResponseItem)
 
 
 /**
+ * @summary Apply for an open role with a CV
+ */
+export const ApplyToJobParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const applyToJobBodyNameMin = 2;
+export const applyToJobBodyNameMax = 120;
+
+export const applyToJobBodyEmailMax = 200;
+
+export const applyToJobBodyPhoneMax = 30;
+
+export const applyToJobBodyCoverLetterMax = 5000;
+
+export const applyToJobBodyCvFilenameMax = 200;
+
+
+
+export const ApplyToJobBody = zod.object({
+  "name": zod.string().min(applyToJobBodyNameMin).max(applyToJobBodyNameMax),
+  "email": zod.string().max(applyToJobBodyEmailMax),
+  "phone": zod.string().max(applyToJobBodyPhoneMax).nullish(),
+  "coverLetter": zod.string().max(applyToJobBodyCoverLetterMax).nullish(),
+  "cv": zod.object({
+  "filename": zod.string().min(1).max(applyToJobBodyCvFilenameMax),
+  "data": zod.string().describe('Base64-encoded PDF, DOC or DOCX, at most 5 MB')
+})
+})
+
+export const ApplyToJobResponse = zod.object({
+  "id": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List every job application, plus older applications sent through the contact form
+ */
+export const ListAdminJobApplicationsResponse = zod.object({
+  "applications": zod.array(zod.object({
+  "id": zod.number(),
+  "jobId": zod.number(),
+  "jobTitle": zod.string().nullable(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullable(),
+  "coverLetter": zod.string().nullable(),
+  "cvFilename": zod.string().nullable(),
+  "hasCv": zod.boolean(),
+  "status": zod.string(),
+  "notes": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})),
+  "contactApplications": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullable(),
+  "message": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}).describe('An application sent before the careers form existed, stored as a contact inquiry'))
+})
+
+
+/**
  * @summary List published blog posts
  */
 export const ListPublishedBlogPostsResponseItem = zod.object({

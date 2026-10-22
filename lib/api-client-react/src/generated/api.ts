@@ -25,6 +25,7 @@ import type {
   AdminChangePasswordInput,
   AdminForgotPasswordInput,
   AdminForgotPasswordResponse,
+  AdminJobApplications,
   AdminLoginInput,
   AdminOverview,
   AdminResetPasswordInput,
@@ -51,6 +52,8 @@ import type {
   Inquiry,
   InquiryInput,
   Job,
+  JobApplicationInput,
+  JobApplicationReceipt,
   ListAdminResourceParams,
   MarketingOverview,
   MarketingReports,
@@ -1495,6 +1498,155 @@ export function useListOpenJobs<TData = Awaited<ReturnType<typeof listOpenJobs>>
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListOpenJobsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getApplyToJobUrl = (id: number,) => {
+
+
+
+
+  return `/api/jobs/${id}/applications`
+}
+
+/**
+ * @summary Apply for an open role with a CV
+ */
+export const applyToJob = async (id: number,
+    jobApplicationInput: JobApplicationInput, options?: Parameters<typeof customFetch>[1]): Promise<JobApplicationReceipt> => {
+
+  return customFetch<JobApplicationReceipt>(getApplyToJobUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(jobApplicationInput)
+  }
+);}
+
+
+
+
+
+export const getApplyToJobMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof applyToJob>>, TError,{id: number;data: BodyType<JobApplicationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof applyToJob>>, TError,{id: number;data: BodyType<JobApplicationInput>}, TContext> => {
+
+const mutationKey = ['applyToJob'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof applyToJob>>, {id: number;data: BodyType<JobApplicationInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  applyToJob(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApplyToJobMutationResult = NonNullable<Awaited<ReturnType<typeof applyToJob>>>
+    export type ApplyToJobMutationBody = BodyType<JobApplicationInput>
+    export type ApplyToJobMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Apply for an open role with a CV
+ */
+export const useApplyToJob = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof applyToJob>>, TError,{id: number;data: BodyType<JobApplicationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof applyToJob>>,
+        TError,
+        {id: number;data: BodyType<JobApplicationInput>},
+        TContext
+      > => {
+      return useMutation(getApplyToJobMutationOptions(options));
+    }
+
+export const getListAdminJobApplicationsUrl = () => {
+
+
+
+
+  return `/api/admin/applications`
+}
+
+/**
+ * @summary List every job application, plus older applications sent through the contact form
+ */
+export const listAdminJobApplications = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminJobApplications> => {
+
+  return customFetch<AdminJobApplications>(getListAdminJobApplicationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminJobApplicationsQueryKey = () => {
+    return [
+    `/api/admin/applications`
+    ] as const;
+    }
+
+
+export const getListAdminJobApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminJobApplications>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminJobApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminJobApplicationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminJobApplications>>> = ({ signal }) => listAdminJobApplications({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminJobApplications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminJobApplicationsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminJobApplications>>>
+export type ListAdminJobApplicationsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List every job application, plus older applications sent through the contact form
+ */
+
+export function useListAdminJobApplications<TData = Awaited<ReturnType<typeof listAdminJobApplications>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminJobApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminJobApplicationsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

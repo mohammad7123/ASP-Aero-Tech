@@ -3,6 +3,7 @@ import { AdminOverview } from "./AdminOverview"
 import { AdminResourceView } from "./AdminResourceView"
 import { AdminSettings } from "./Settings"
 import { AdminMarketing } from "./Marketing"
+import { AdminApplications } from "./AdminApplications"
 import { ADMIN_RESOURCES, Sidebar } from "./Sidebar"
 import { Shield, LogOut } from "lucide-react"
 import { useAdminLogout, getGetAdminSessionQueryKey } from "@workspace/api-client-react"
@@ -60,6 +61,7 @@ export function AdminWorkspace() {
               data-testid="select-admin-mobile-navigation"
             >
               <option value="/admin">Overview</option>
+              <option value="/admin/applications">Job Applications</option>
               <option value="/admin/marketing">Marketing Hub</option>
               <option value="/admin/settings">System Settings</option>
               {ADMIN_RESOURCES.map((resource) => (
@@ -77,6 +79,7 @@ export function AdminWorkspace() {
             <Switch>
               <Route path="/admin" component={AdminOverview} />
               <Route path="/admin/settings" component={AdminSettings} />
+              <Route path="/admin/applications" component={AdminApplications} />
               <Route path="/admin/marketing" component={AdminMarketing} />
               <Route path="/admin/resources/:resource" component={AdminResourceView} />
             </Switch>

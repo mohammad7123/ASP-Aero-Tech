@@ -42,6 +42,8 @@ const nextConfig: NextConfig = {
     // ~30 static pages: a couple of build workers beat one-per-core, especially
     // on memory-constrained machines (15 parallel workers caused swap thrash).
     staticGenerationMinPagesPerWorker: 20,
+    // Job applications send a CV (max 5 MB) through a Server Action; the default limit is 1 MB.
+    serverActions: { bodySizeLimit: "6mb" },
   },
   async headers() {
     return [

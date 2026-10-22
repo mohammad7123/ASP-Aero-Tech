@@ -8,6 +8,7 @@ import storageRouter from "./storage";
 import settingsRouter from "./settings";
 import campaignsRouter from "./campaigns";
 import chatbotRouter from "./chatbot";
+import careersRouter from "./careers";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(storageRouter);
 router.use(settingsRouter);
 router.use(campaignsRouter);
 router.use(chatbotRouter);
+router.use(careersRouter);
 
 export default router;

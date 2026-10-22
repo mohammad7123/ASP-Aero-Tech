@@ -27,7 +27,10 @@ app.use(
   }),
 );
 app.use(cors());
-app.use(express.json());
+// Job applications carry a base64 CV (up to 5 MB); every other route keeps the small default limit.
+const jsonDefault = express.json();
+const jsonApplication = express.json({ limit: "8mb" });
+app.use((req, res, next) => (/^\/api\/jobs\/\d+\/applications$/.test(req.path) ? jsonApplication : jsonDefault)(req, res, next));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 

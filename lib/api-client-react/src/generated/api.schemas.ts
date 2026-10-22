@@ -72,6 +72,81 @@ export interface Job {
   salaryRange: string | null;
 }
 
+export type JobApplicationInputCv = {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  filename: string;
+  /** Base64-encoded PDF, DOC or DOCX, at most 5 MB */
+  data: string;
+};
+
+export interface JobApplicationInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 200 */
+  email: string;
+  /**
+     * @maxLength 30
+     * @nullable
+     */
+  phone?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  coverLetter?: string | null;
+  cv: JobApplicationInputCv;
+}
+
+export interface JobApplicationReceipt {
+  id: number;
+  createdAt: string;
+}
+
+export interface AdminJobApplication {
+  id: number;
+  jobId: number;
+  /** @nullable */
+  jobTitle: string | null;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  coverLetter: string | null;
+  /** @nullable */
+  cvFilename: string | null;
+  hasCv: boolean;
+  status: string;
+  /** @nullable */
+  notes: string | null;
+  createdAt: string;
+}
+
+/**
+ * An application sent before the careers form existed, stored as a contact inquiry
+ */
+export interface ContactFormApplication {
+  id: number;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  message: string | null;
+  createdAt: string;
+}
+
+export interface AdminJobApplications {
+  applications: AdminJobApplication[];
+  contactApplications: ContactFormApplication[];
+}
+
 export interface BlogPostSummary {
   id: number;
   title: string;

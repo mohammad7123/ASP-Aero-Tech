@@ -243,6 +243,66 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Job"
+  /jobs/{id}/applications:
+    post:
+      operationId: applyToJob
+      tags: [content]
+      summary: Apply for an open role with a CV
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobApplicationInput"
+      responses:
+        "201":
+          description: Application received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobApplicationReceipt"
+        "400":
+          description: Invalid application or CV
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: The role is not open
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many applications from this client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/applications:
+    get:
+      operationId: listAdminJobApplications
+      tags: [admin]
+      summary: List every job application, plus older applications sent through the contact form
+      responses:
+        "200":
+          description: Applications, newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminJobApplications"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /content/blog-posts:
     get:
       operationId: listPublishedBlogPosts
@@ -833,6 +893,102 @@ components:
         salaryRange:
           type: ["string", "null"]
       required: [id, title, department, location, type, description, requirements, salaryRange]
+    JobApplicationInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        email:
+          type: string
+          maxLength: 200
+        phone:
+          type: ["string", "null"]
+          maxLength: 30
+        coverLetter:
+          type: ["string", "null"]
+          maxLength: 5000
+        cv:
+          type: object
+          properties:
+            filename:
+              type: string
+              minLength: 1
+              maxLength: 200
+            data:
+              type: string
+              description: Base64-encoded PDF, DOC or DOCX, at most 5 MB
+          required: [filename, data]
+      required: [name, email, cv]
+    JobApplicationReceipt:
+      type: object
+      properties:
+        id:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, createdAt]
+    AdminJobApplication:
+      type: object
+      properties:
+        id:
+          type: number
+        jobId:
+          type: number
+        jobTitle:
+          type: ["string", "null"]
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        coverLetter:
+          type: ["string", "null"]
+        cvFilename:
+          type: ["string", "null"]
+        hasCv:
+          type: boolean
+        status:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, jobId, jobTitle, name, email, phone, coverLetter, cvFilename, hasCv, status, notes, createdAt]
+    ContactFormApplication:
+      type: object
+      description: An application sent before the careers form existed, stored as a contact inquiry
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        message:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, email, phone, message, createdAt]
+    AdminJobApplications:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminJobApplication"
+        contactApplications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactFormApplication"
+      required: [applications, contactApplications]
     BlogPostSummary:
       type: object
       properties:
