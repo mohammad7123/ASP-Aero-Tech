@@ -1,10 +1,12 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { heroModel } from "@/content/products";
 import { anatomyAnchors, anatomyLayer } from "@/lib/anatomy";
+import { onBootComplete } from "@/lib/boot";
+import { prefersReducedMotion } from "@/lib/device";
 import { flight, segmentProgress, type SegmentName } from "@/lib/flight";
 import { useTheme } from "@/lib/theme";
 import { damp, lerp, remap, smoothstep } from "@/lib/utils";
@@ -115,6 +117,17 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
 
   const drive = useMemo<DriveRefs>(() => ({ spin: { current: 0.85 }, explode: { current: 0 } }), []);
   const sim = useRef({ p: 0, u: 0, speed: 0, yaw: 0, pitch: 0, roll: 0, prevYaw: 0, ready: false });
+  // Hero entrance: -1 = waiting for the intro loader, then seconds since it started; skipped below the hero.
+  const intro = useRef({ booted: false, start: -1, done: false });
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      intro.current.done = true;
+      return;
+    }
+    return onBootComplete(() => {
+      intro.current.booted = true;
+    });
+  }, []);
   const v = useMemo(
     () => ({
       pos: new THREE.Vector3(),
@@ -125,6 +138,7 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
       target: new THREE.Vector3(),
       look: new THREE.Vector3(),
       proj: new THREE.Vector3(),
+      anchor: new THREE.Vector3(),
     }),
     [],
   );
@@ -168,7 +182,24 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
     const t = state.clock.elapsedTime;
     const bob = Math.sin(t * 1.7) * 0.09 * hoverFactor + Math.sin(t * 0.63) * 0.05;
 
-    drone.position.copy(v.pos).addScaledVector(UP, bob);
+    // Entrance (top of the page only): rise into frame, swing into pose, spool the rotors up, ease the camera in.
+    const I = intro.current;
+    // Wait for both the intro loader and the world's first frames (flight.ready), so the entrance is actually seen.
+    if (!I.done && I.booted && flight.ready) {
+      if (I.start < 0) {
+        I.start = t;
+        if (flight.progress > 0.02) I.done = true;
+      }
+    }
+    const introE = I.done ? 1 : I.start < 0 ? 0 : Math.min(1, (t - I.start) / 2.8);
+    if (introE >= 1) I.done = true;
+    const rise = 1 - (1 - introE) ** 3; // ease-out cubic
+    const away = 1 - rise;
+
+    // The camera frames the resting position (anchor) so the drone visibly climbs into the shot.
+    v.anchor.copy(v.pos).addScaledVector(UP, bob);
+    // Rises from just above the pad: starting underground put the drone and its ride-along lights inside the terrain.
+    drone.position.copy(v.anchor).addScaledVector(UP, -away * 1.3);
 
     // 3) Attitude: face along the path, pitch into speed, bank into turns, follow the pointer in the hero.
     const yaw = Math.atan2(-v.tan.x, -v.tan.z);
@@ -186,16 +217,17 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
     S.pitch = damp(S.pitch, -speedN * 0.32 + py * 0.14 * heroPointer + Math.sin(t * 0.9) * 0.015, 3, dt);
     // Bank into turns: a right turn (dYaw < 0) lowers the right side (negative roll).
     S.roll = damp(S.roll, (dYaw / dt) * 0.6 + px * 0.22 * heroPointer + Math.sin(t * 1.1) * 0.02, 3, dt);
-    drone.rotation.set(S.pitch, S.yaw, S.roll, "YXZ");
+    drone.rotation.set(S.pitch + away * 0.28, S.yaw + away * 1.5, S.roll - away * 0.18, "YXZ");
 
     // 4) Exploded view & rotor speed.
     const e = explodeAt(p);
     drive.explode.current = e;
-    drive.spin.current = Math.max(0.12, 0.8 + speedN * 0.2 - e * 0.65);
+    drive.spin.current = Math.max(0.12, 0.8 + speedN * 0.2 - e * 0.65) * (0.25 + 0.75 * smoothstep(Math.min(1, introE * 2)));
 
     // 5) Chase camera on an orbit around the drone.
     const k = sampleCamera(p, cameraKeys(seg), mobile, 1 - smoothstep(remap(heroT, 0.25, 0.9)));
-    const az = k.az + px * 0.07 * heroPointer;
+    // Entrance: a slight orbit swing; the "push in" is a lens zoom (fov) — pulling the camera back put it inside the hillside.
+    const az = k.az + px * 0.07 * heroPointer + away * 0.3;
     const el = k.el + py * 0.045 * heroPointer;
     v.camDir
       .copy(v.tan)
@@ -204,13 +236,14 @@ export function WorldScene({ tier }: { tier: "high" | "low" }) {
       .multiplyScalar(Math.cos(el))
       .addScaledVector(UP, Math.sin(el));
     const cam = state.camera as THREE.PerspectiveCamera;
-    cam.position.copy(drone.position).addScaledVector(v.camDir, k.r);
-    v.look.copy(drone.position).sub(cam.position).normalize();
+    cam.position.copy(v.anchor).addScaledVector(v.camDir, k.r);
+    v.look.copy(v.anchor).sub(cam.position).normalize();
     v.camRight.crossVectors(v.look, UP).normalize();
-    v.target.copy(drone.position).addScaledVector(v.camRight, -k.side).addScaledVector(UP, k.up);
+    v.target.copy(v.anchor).addScaledVector(v.camRight, -k.side).addScaledVector(UP, k.up);
     cam.lookAt(v.target);
-    if (Math.abs(cam.fov - k.fov) > 0.01) {
-      cam.fov = k.fov;
+    const fov = k.fov + away * 12;
+    if (Math.abs(cam.fov - fov) > 0.01) {
+      cam.fov = fov;
       cam.updateProjectionMatrix();
     }
 

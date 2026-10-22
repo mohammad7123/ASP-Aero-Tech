@@ -1,5 +1,6 @@
 "use client";
 
+import * as THREE from "three";
 import type { AnatomyKey } from "@/content/highlights";
 import { anatomyAnchors } from "@/lib/anatomy";
 import { G } from "../geometry";
@@ -14,7 +15,7 @@ export type MultirotorSpec = {
   armStyle?: "tube" | "flat";
   layout?: "x" | "stretch";
   body: "canopy" | "box" | "fpv" | "compact" | "whoop";
-  bodyMat: keyof Pick<MaterialSet, "shell" | "camo" | "carbon" | "graphite" | "black" | "olive">;
+  bodyMat: keyof Pick<MaterialSet, "shell" | "tactical" | "camo" | "carbon" | "graphite" | "black" | "olive">;
   propRadius: number;
   propBlades?: number;
   motorSize?: number;
@@ -193,19 +194,88 @@ export function Multirotor({ spec }: { spec: MultirotorSpec }) {
 
 /** Reference dimensions per body type, used to place payloads and add-ons. */
 const BODY = {
-  canopy: { width: 0.66, length: 0.98, top: 0.32, bottom: -0.04, mid: 0.1, armY: 0.02, armStart: 0.2 },
+  canopy: { width: 0.66, length: 1.02, top: 0.25, bottom: -0.06, mid: 0.08, armY: 0.02, armStart: 0.2 },
   box: { width: 0.56, length: 0.6, top: 0.18, bottom: -0.1, mid: 0.04, armY: 0.04, armStart: 0.22 },
   fpv: { width: 0.2, length: 0.5, top: 0.12, bottom: -0.03, mid: 0.05, armY: 0, armStart: 0.06 },
   compact: { width: 0.3, length: 0.52, top: 0.1, bottom: -0.09, mid: 0.0, armY: 0.02, armStart: 0.12 },
   whoop: { width: 0.18, length: 0.24, top: 0.05, bottom: -0.03, mid: 0.02, armY: 0, armStart: 0.06 },
 } as const;
 
+/**
+ * Canopy airframe: a low aerodynamic pod split at the waist. Profile is
+ * [radius, position along the body]; +position is the nose (forward, −Z).
+ */
+const POD: [number, number][] = [
+  [0, -0.5],
+  [0.09, -0.49],
+  [0.17, -0.44],
+  [0.24, -0.34],
+  [0.29, -0.18],
+  [0.31, 0],
+  [0.3, 0.14],
+  [0.26, 0.29],
+  [0.19, 0.41],
+  [0.1, 0.49],
+  [0, 0.52],
+];
+const WAIST_Y = 0.06;
+const HULL_SCALE: [number, number, number] = [1.05, 0.42, 1];
+const CANOPY_SCALE: [number, number, number] = [1, 0.72, 0.97];
+const VISOR: [number, number][] = [
+  [0, -0.1],
+  [0.1, -0.08],
+  [0.15, 0],
+  [0.13, 0.09],
+  [0.07, 0.15],
+  [0, 0.17],
+];
+
+/** Radius of the pod at a position along it (linear between profile points). */
+function podRadius(y: number) {
+  for (let i = 0; i < POD.length - 1; i++) {
+    const [r0, y0] = POD[i];
+    const [r1, y1] = POD[i + 1];
+    if (y >= y0 && y <= y1) return r0 + ((r1 - r0) * (y - y0)) / (y1 - y0 || 1);
+  }
+  return 0;
+}
+
+// Signature light: a loop hugging the hull outline at the waist.
+const WAIST_LOOP = (() => {
+  const right: THREE.Vector3[] = [];
+  for (let i = 1; i < POD.length - 1; i++) {
+    const [r, y] = POD[i];
+    right.push(new THREE.Vector3(r * HULL_SCALE[0] + 0.004, WAIST_Y, -y));
+  }
+  const left = right.map((p) => new THREE.Vector3(-p.x, p.y, p.z)).reverse();
+  return [new THREE.Vector3(0, WAIST_Y, 0.5), ...right, new THREE.Vector3(0, WAIST_Y, -0.52), ...left];
+})();
+
+// Twin racing stripes following the canopy crown.
+const stripe = (x: number) =>
+  Array.from({ length: 9 }, (_, i) => {
+    const y = -0.3 + i * 0.07; // along the body, tail → nose
+    const r = podRadius(y) * CANOPY_SCALE[0];
+    const h = Math.sqrt(Math.max(0, r * r - x * x)) / r; // height fraction across the crown
+    return new THREE.Vector3(x, WAIST_Y + podRadius(y) * CANOPY_SCALE[1] * h + 0.004, -y * CANOPY_SCALE[2]);
+  });
+const STRIPE_L = stripe(-0.045);
+const STRIPE_R = stripe(0.045);
+
 function CanopyBody({ mats, bodyMat, labels }: { mats: MaterialSet; bodyMat: MaterialSet[keyof MaterialSet]; labels?: boolean }) {
   return (
     <group>
-      {/* base plate (stays put — part of the airframe) */}
-      <mesh geometry={G.rbox(0.6, 0.05, 0.9, 0.02)} material={mats.carbon} position-y={0.0} />
-      <mesh geometry={G.rbox(0.5, 0.04, 0.2, 0.015)} material={mats.graphite} position={[0, -0.03, 0.3]} />
+      {/* lower hull + internal deck (stay put — part of the airframe) */}
+      <mesh geometry={G.hull("pod", POD, "lower")} material={bodyMat} scale={HULL_SCALE} position-y={WAIST_Y} />
+      <mesh geometry={G.rbox(0.4, 0.04, 0.6, 0.02)} material={mats.carbon} position-y={0.0} />
+      {/* side intakes */}
+      {[-1, 1].map((side) => (
+        <mesh key={side} geometry={G.rbox(0.03, 0.045, 0.16, 0.012)} material={mats.black} position={[side * 0.3, WAIST_Y - 0.02, 0.12]} />
+      ))}
+      {/* waist signature light + nose / tail lights */}
+      <mesh geometry={G.tube("waist-loop", WAIST_LOOP, 0.009, 160, true)} material={mats.ledCyan} />
+      <Led color="white" position={[0, WAIST_Y - 0.03, -0.5]} size={0.016} halo={0.16} />
+      <Led color="red" position={[0, WAIST_Y + 0.01, 0.5]} size={0.016} halo={0.18} blink={1.2} />
 
       {/* flight computer */}
       <ExplodePart offset={EXPLODE.fc} delay={0.08}>
@@ -230,15 +300,13 @@ function CanopyBody({ mats, bodyMat, labels }: { mats: MaterialSet; bodyMat: Mat
         </group>
       </ExplodePart>
 
-      {/* canopy shell */}
+      {/* canopy shell: sculpted upper pod, dark glass sensor visor, saffron racing stripes */}
       <ExplodePart offset={EXPLODE.canopy} delay={0.02}>
-        <group position-y={0.04}>
-          <mesh geometry={G.sphere(1, 48, 24, Math.PI * 2, Math.PI / 2)} material={bodyMat} scale={[0.34, 0.27, 0.52]} />
-          {/* visor */}
-          <mesh geometry={G.sphere(1, 32, 16, Math.PI * 2, Math.PI / 2)} material={mats.lens} scale={[0.2, 0.17, 0.2]} position={[0, 0.02, -0.33]} />
-          {/* signature light strip */}
-          <mesh geometry={G.torus(1, 0.012, 6, 64)} material={mats.ledCyan} rotation-x={Math.PI / 2} scale={[0.347, 0.527, 1]} position-y={0.012} />
-          <mesh geometry={G.box(0.02, 0.012, 0.42)} material={mats.accent} position={[0, 0.27, 0.06]} />
+        <group>
+          <mesh geometry={G.hull("pod", POD, "upper")} material={bodyMat} scale={CANOPY_SCALE} position-y={WAIST_Y} />
+          <mesh geometry={G.hull("visor", VISOR, "upper")} material={mats.lens} scale={[1.02, 0.85, 1]} position={[0, WAIST_Y + 0.012, -0.4]} />
+          <mesh geometry={G.tube("stripe-l", STRIPE_L, 0.007, 48)} material={mats.accent} />
+          <mesh geometry={G.tube("stripe-r", STRIPE_R, 0.007, 48)} material={mats.accent} />
           {labels && <AnatomyLabel part="canopy" offset={[-0.2, 0.32, 0]} side="left" />}
         </group>
       </ExplodePart>

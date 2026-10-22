@@ -12,7 +12,7 @@ export const HERO_SPEC: MultirotorSpec = {
   armLength: 0.95,
   armRadius: 0.042,
   body: "canopy",
-  bodyMat: "shell",
+  bodyMat: "tactical",
   propRadius: 0.42,
   motorSize: 1.2,
   payload: "gimbal",

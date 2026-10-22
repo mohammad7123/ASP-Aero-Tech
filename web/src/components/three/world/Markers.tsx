@@ -129,7 +129,8 @@ function Beacon({ position, phase }: { position: THREE.Vector3; phase: number })
         fragmentShader: /* glsl */ `
           uniform vec3 uColor; uniform float uTime; varying vec2 vUv; varying float vDist;
           void main() {
-            float fade = pow(1.0 - vUv.y, 1.4) * smoothstep(12.0, 60.0, vDist);
+            // max(): interpolated UVs can overshoot 1 by a hair, and pow() of a negative is NaN (bloom smears NaN into black)
+            float fade = pow(max(1.0 - vUv.y, 0.0), 1.4) * smoothstep(12.0, 60.0, vDist);
             float pulse = 0.75 + 0.25 * sin(uTime * 2.0 + vUv.y * 12.0);
             gl_FragColor = vec4(uColor, fade * pulse * 0.5);
           }

@@ -27,6 +27,9 @@ export function Sky() {
           uGlow: { value: new THREE.Color("#ff8a3c") },
           uGlowK: { value: 1 },
           uGlowDir: { value: new THREE.Vector3(0.15, 0.02, -1).normalize() },
+          // Daylight sun: up and to the right behind the hero drone (roughly where the key light comes from).
+          uSunDir: { value: new THREE.Vector3(-0.5, 0.36, 0.79).normalize() },
+          uSunK: { value: 0 },
         },
         vertexShader: /* glsl */ `
           varying vec3 vDir;
@@ -38,6 +41,7 @@ export function Sky() {
         `,
         fragmentShader: /* glsl */ `
           uniform vec3 uZenith; uniform vec3 uHorizon; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform float uGlowK;
+          uniform vec3 uSunDir; uniform float uSunK;
           varying vec3 vDir;
           void main() {
             float h = clamp(vDir.y, -0.2, 1.0);
@@ -46,6 +50,9 @@ export function Sky() {
             float band = exp(-abs(vDir.y - 0.01) * 14.0);
             col += uGlow * (pow(g, 10.0) * 0.55 + pow(g, 3.0) * 0.12) * band * uGlowK;
             col += uHorizon * band * 0.35;
+            // sun: an HDR disc (> 1, so bloom turns it into glare) inside a warm halo
+            float s = max(dot(normalize(vDir), uSunDir), 0.0);
+            col += vec3(1.0, 0.93, 0.8) * (smoothstep(0.99935, 0.99965, s) * 7.0 + pow(s, 900.0) * 1.6 + pow(s, 48.0) * 0.28) * uSunK;
             gl_FragColor = vec4(col, 1.0);
             #include <tonemapping_fragment>
             #include <colorspace_fragment>
@@ -60,6 +67,7 @@ export function Sky() {
     material.uniforms.uHorizon.value.set(t.skyHorizon);
     material.uniforms.uGlow.value.set(t.skyGlow);
     material.uniforms.uGlowK.value = t.glowStrength;
+    material.uniforms.uSunK.value = light ? 1 : 0;
   }, [light, material]);
   useEffect(() => () => material.dispose(), [material]);
   useFrame(({ camera }) => ref.current?.position.copy(camera.position));

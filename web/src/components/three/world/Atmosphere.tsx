@@ -138,7 +138,7 @@ export function useBeamMaterial() {
           void main() {
             float facing = abs(dot(normalize(vN), normalize(vV)));
             float edge = pow(facing, 1.6);
-            float along = mix(0.18, 1.0, pow(vUv.y, 0.8));
+            float along = mix(0.18, 1.0, pow(max(vUv.y, 0.0), 0.8)); // max(): pow of a negative is NaN
             float n = noise(vec2(vUv.x * 18.0, vUv.y * 5.0 - uTime * 0.6));
             float a = edge * along * (0.55 + 0.45 * n) * uOpacity * 0.32;
             gl_FragColor = vec4(uColor, a);

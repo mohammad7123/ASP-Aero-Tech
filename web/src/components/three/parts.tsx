@@ -14,6 +14,7 @@ export function Propeller({ radius = 0.45, blades = 2, dir = 1, bladeWidth = 1 }
   const mats = useMats();
   const { spin } = useDrive();
   const ref = useRef<THREE.Group>(null);
+  const bladesRef = useRef<THREE.Group>(null);
   const blurRef = useRef<THREE.Mesh>(null);
   // Stable per-instance phase so props don't spin in lockstep.
   const id = useId();
@@ -23,21 +24,34 @@ export function Propeller({ radius = 0.45, blades = 2, dir = 1, bladeWidth = 1 }
     const g = ref.current;
     if (!g) return;
     const s = spin.current;
-    g.rotation.y = (g.rotation.y + dir * Math.min(dt, 0.05) * (4 + 70 * s)) % (Math.PI * 2);
-    if (blurRef.current) blurRef.current.visible = s > 0.15;
+    const step = Math.min(dt, 0.05);
+    g.rotation.y = (g.rotation.y + dir * step * (4 + 70 * s)) % (Math.PI * 2);
+    // At speed a camera sees a translucent disc, not blades: cross-fade blades → blur disc.
+    if (bladesRef.current) bladesRef.current.visible = s < 0.55;
+    const blur = blurRef.current;
+    if (blur) {
+      blur.visible = s > 0.15;
+      // The disc pattern turns slowly (a real rotor "shimmers"; matching hub speed would strobe).
+      blur.rotation.z += dir * step * 5;
+      // Shared material: every rotor in this set runs at the same drive speed, so one value fits all.
+      (blur.material as THREE.MeshBasicMaterial).opacity = Math.min(0.85, Math.max(0, (s - 0.15) / 0.45) * 0.85);
+    }
   });
 
   return (
     <group>
       <group ref={ref} rotation-y={phase}>
         <mesh geometry={G.cyl(radius * 0.09, radius * 0.11, radius * 0.07, 16)} material={mats.metal} />
-        {Array.from({ length: blades }, (_, i) => (
-          <group key={i} rotation-y={(i / blades) * Math.PI * 2}>
-            <mesh geometry={G.blade(radius, bladeWidth)} material={mats.prop} rotation-x={dir * 0.16} />
-          </group>
-        ))}
+        <mesh geometry={G.cone(radius * 0.07, radius * 0.1, 16)} material={mats.accent} position-y={radius * 0.08} />
+        <group ref={bladesRef}>
+          {Array.from({ length: blades }, (_, i) => (
+            <group key={i} rotation-y={(i / blades) * Math.PI * 2}>
+              <mesh geometry={G.blade(radius, bladeWidth)} material={mats.prop} rotation-x={dir * 0.16} />
+            </group>
+          ))}
+        </group>
       </group>
-      <mesh ref={blurRef} geometry={G.circle(radius, 40)} material={mats.propBlur} rotation-x={-Math.PI / 2} position-y={0.004} />
+      <mesh ref={blurRef} geometry={G.circle(radius * 1.04, 48)} material={mats.propBlur} rotation-x={-Math.PI / 2} position-y={0.006} />
     </group>
   );
 }
@@ -48,9 +62,14 @@ export function Motor({ size = 1, accent = true }: { size?: number; accent?: boo
   const s = size;
   return (
     <group>
-      <mesh geometry={G.cyl(0.085 * s, 0.095 * s, 0.05 * s, 24)} material={mats.motor} position-y={0.025 * s} />
-      <mesh geometry={G.cyl(0.09 * s, 0.09 * s, 0.1 * s, 28)} material={mats.metal} position-y={0.1 * s} />
-      <mesh geometry={G.cyl(0.092 * s, 0.092 * s, 0.022 * s, 28)} material={accent ? mats.accent : mats.motor} position-y={0.15 * s} />
+      {/* stator mount */}
+      <mesh geometry={G.cyl(0.082 * s, 0.098 * s, 0.05 * s, 32)} material={mats.motor} position-y={0.025 * s} />
+      {/* turned-metal bell with a dark cooling-vent band */}
+      <mesh geometry={G.cyl(0.086 * s, 0.092 * s, 0.1 * s, 40)} material={mats.metal} position-y={0.1 * s} />
+      <mesh geometry={G.torus(0.091 * s, 0.009 * s, 8, 40)} material={mats.black} rotation-x={Math.PI / 2} position-y={0.085 * s} />
+      <mesh geometry={G.torus(0.091 * s, 0.009 * s, 8, 40)} material={mats.black} rotation-x={Math.PI / 2} position-y={0.112 * s} />
+      {/* bell cap */}
+      <mesh geometry={G.cyl(0.07 * s, 0.087 * s, 0.022 * s, 40)} material={accent ? mats.accent : mats.motor} position-y={0.161 * s} />
       <mesh geometry={G.cyl(0.012 * s, 0.012 * s, 0.05 * s, 8)} material={mats.metal} position-y={0.18 * s} />
     </group>
   );

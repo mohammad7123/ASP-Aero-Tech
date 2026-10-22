@@ -37,11 +37,23 @@ export const G = {
       g.rotateX(-Math.PI / 2);
       return g;
     }),
+  /**
+   * Like `fuselage`, but only the upper or lower half of the revolution — so a
+   * pod can be split at its waist (e.g. a canopy that lifts off in exploded views).
+   */
+  hull: (key: string, profile: [number, number][], half: "upper" | "lower", seg = 48) =>
+    memo(`hull:${key}:${half}`, () => {
+      // Lathe x = r·sin(φ), z = r·cos(φ); after rotateX(−90°) world-up is cos(φ), so the upper half is φ ∈ [−90°, 90°].
+      const start = half === "upper" ? -Math.PI / 2 : Math.PI / 2;
+      const g = new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), seg, start, Math.PI);
+      g.rotateX(-Math.PI / 2);
+      return g;
+    }),
   blade: (radius: number, width = 1) => memo(`blade:${k(radius, width)}`, () => bladeGeometry(radius, width)),
   wing: (span: number, chord: number, thickness = 0.12) => memo(`wing:${k(span, chord, thickness)}`, () => wingGeometry(span, chord, thickness)),
   /** Thin tube following a list of points (tethers, fibre lines, cables). */
-  tube: (key: string, points: THREE.Vector3[], radius: number, segments = 64) =>
-    memo(`tube:${key}`, () => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), segments, radius, 6, false)),
+  tube: (key: string, points: THREE.Vector3[], radius: number, segments = 64, closed = false) =>
+    memo(`tube:${key}`, () => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, closed), segments, radius, 6, closed)),
 };
 
 /** A single propeller blade lying flat in the XZ plane, root at the origin, tip at +X. */

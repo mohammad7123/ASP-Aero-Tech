@@ -93,6 +93,7 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
       }
     }
     g.setAttribute("aColor", new THREE.BufferAttribute(colors.dark.slice(), 3));
+    g.computeVertexNormals(); // smooth normals, blended with the faceted ones in the shader
     g.computeBoundingSphere();
     return { geometry: g, colors };
   }, [segX, segZ]);
@@ -115,6 +116,8 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
             uAmbient: { value: new THREE.Color("#2a3a58") },
             uLine: { value: new THREE.Color("#2bd9ff") },
             uLineMix: { value: 0 },
+            uLineK: { value: 1 },
+            uSmooth: { value: 0.35 },
             uTime: { value: 0 },
             uScanCenter: { value: new THREE.Vector3() },
             uScanStrength: { value: 0.22 },
@@ -126,8 +129,10 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
           attribute vec3 aColor;
           varying vec3 vColor;
           varying vec3 vWorld;
+          varying vec3 vNormal;
           void main() {
             vColor = aColor;
+            vNormal = normalize(mat3(modelMatrix) * normal);
             vec4 world = modelMatrix * vec4(position, 1.0);
             vWorld = world.xyz;
             vec4 mvPosition = viewMatrix * world;
@@ -139,12 +144,17 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
           #include <common>
           #include <fog_pars_fragment>
           uniform vec3 uSunDir; uniform vec3 uSunColor; uniform vec3 uAmbient; uniform vec3 uLine; uniform float uLineMix;
-          uniform float uTime; uniform vec3 uScanCenter; uniform float uScanStrength;
+          uniform float uTime; uniform vec3 uScanCenter; uniform float uScanStrength; uniform float uLineK; uniform float uSmooth;
           varying vec3 vColor;
           varying vec3 vWorld;
+          varying vec3 vNormal;
           void main() {
-            // faceted low-poly normal from screen-space derivatives
-            vec3 n = normalize(cross(dFdx(vWorld), dFdy(vWorld)));
+            // faceted low-poly normal from screen-space derivatives, softened towards the smooth normal
+            // Guard every normalize: a zero-length vector gives NaN, and the bloom blur smears one NaN pixel into a black blob.
+            vec3 facetRaw = cross(dFdx(vWorld), dFdy(vWorld));
+            vec3 facet = dot(facetRaw, facetRaw) > 1e-12 ? normalize(facetRaw) : vec3(0.0, 1.0, 0.0);
+            vec3 blended = mix(facet, vNormal, uSmooth);
+            vec3 n = dot(blended, blended) > 1e-8 ? normalize(blended) : vec3(0.0, 1.0, 0.0);
             float diff = max(dot(n, uSunDir), 0.0);
             vec3 col = vColor * (uAmbient + uSunColor * diff);
 
@@ -161,7 +171,7 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
             vec2 gw = abs(fract(g - 0.5) - 0.5) / max(fwidth(g), vec2(1e-4));
             float grid = 1.0 - min(min(gw.x, gw.y), 1.0);
 
-            float lk = (contour * 0.2 + grid * 0.07) * near;
+            float lk = (contour * 0.2 + grid * 0.07) * near * uLineK;
             col = mix(col + uLine * lk, mix(col, uLine, min(1.0, lk * 1.6)), uLineMix);
 
             // radar ring sweeping outward from the drone
@@ -188,6 +198,8 @@ export function Terrain({ detail = "high" }: { detail?: "high" | "low" }) {
     material.uniforms.uAmbient.value.set(t.ambient);
     material.uniforms.uLine.value.set(t.line);
     material.uniforms.uLineMix.value = t.lineMix;
+    material.uniforms.uLineK.value = t.lineK;
+    material.uniforms.uSmooth.value = t.smooth;
   }, [light, material]);
 
   useEffect(

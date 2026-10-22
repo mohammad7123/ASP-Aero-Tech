@@ -8,6 +8,7 @@ import { flight } from "@/lib/flight";
 import { useTheme } from "@/lib/theme";
 import { createStudioEnvironment } from "../environment";
 import { worldTheme } from "./palette";
+import { PostFx } from "./PostFx";
 import { WorldScene } from "./WorldScene";
 
 /**
@@ -26,6 +27,7 @@ export default function WorldCanvas({ tier, onReady }: { tier: "high" | "low"; o
   const [dpr, setDpr] = useState(maxDpr);
   const compiled = useRef(false);
   const light = useTheme() === "light";
+  const postFx = tier === "high";
 
   useEffect(() => {
     const sync = () => {
@@ -65,6 +67,7 @@ export default function WorldCanvas({ tier, onReady }: { tier: "high" | "low"; o
       />
       <ClearColor color={worldTheme(light).clear} />
       <WorldScene tier={tier} />
+      {postFx && <PostFx />}
       <Warmup onCompiled={handleCompiled} />
       <FirstFrames onReady={onReady} />
     </Canvas>
