@@ -269,6 +269,7 @@ router.post("/admin/password/forgot", async (req, res): Promise<void> => {
     );
     const resetUrl = `${appUrl(req)}/admin/reset-password?token=${token}`;
     let emailed = false;
+    let reason = admin.email ? "smtp-not-configured" : "no-recovery-email";
     if (admin.email) {
       try {
         emailed = await sendMail({
@@ -278,10 +279,12 @@ router.post("/admin/password/forgot", async (req, res): Promise<void> => {
           html: `<p>Hi ${escapeHtml(admin.username)},</p><p>Use the button below to choose a new admin password. It expires in ${resetTtlMinutes} minutes and works once.</p><p><a href="${resetUrl}" style="display:inline-block;padding:12px 20px;background:#0B203D;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">Reset password</a></p><p style="color:#64748b;font-size:13px">If you did not request this, you can ignore this email; your password will not change.</p>`,
         });
       } catch (error) {
+        reason = "smtp-error";
         req.log.error({ err: error }, "Failed to send password reset email");
       }
     }
-    if (!emailed) req.log.warn({ adminId: admin.id, hasEmail: Boolean(admin.email) }, "Password reset email not sent: no recovery email or SMTP is not configured");
+    // reason: no-recovery-email | smtp-not-configured | smtp-error (details in the error line above)
+    if (!emailed) req.log.warn({ adminId: admin.id, reason }, `Password reset email not sent (${reason})`);
     if (!isProduction()) {
       devResetUrl = resetUrl;
       req.log.info({ resetUrl }, "Password reset link (development only)");
